@@ -15,12 +15,14 @@ module.exports = function (app) {
               geoHash[geoData[j].geo]= geoData[j];
             }
 
-
             for (var i = 0; i < graphData.length; i++) {
               graphData[i].time = graphData[i].time + '';
               graphData[i]['geo.name'] = geoHash[graphData[i].geo]['geo.name'];
               graphData[i]['geo.cat'] = geoHash[graphData[i].geo]['geo.cat'];
               graphData[i]['geo.region'] = geoHash[graphData[i].geo]['geo.region'];
+
+              graphData[i]['u5mr'] = graphData[i]["u5mr\r"];
+              delete graphData[i]["u5mr\r"];
             }
             cb(err, graphData);
           });
