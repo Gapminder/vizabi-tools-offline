@@ -1,3 +1,5 @@
+//todo: separate this service into two diff readers (for chrome fs and user fs)
+
 module.exports = function (app) {
   app
     .factory('readerService', ['$http', 'config', function ($http, config) {
@@ -69,6 +71,37 @@ module.exports = function (app) {
             //return result; //JavaScript object
             return JSON.stringify(result); //JSON
           }
+        },
+        //read file from chrome file system
+        getChromeFsFile: function(name, isCreate, cb) {
+          config.fileSystem.root.getFile(name, {create: isCreate}, function (fileEntry) {
+            fileEntry.file(function (file) {
+              var reader = new FileReader();
+              reader.onloadend = function (e) {
+                cb(null, this.result);
+              };
+              reader.readAsText(file);
+            }, cb);
+          }, cb);
+        },
+        writeChromeFsFile: function(name, content, cb) {
+          config.fileSystem.root.getFile(name, {create: true}, function (fileEntry) {
+            // Create a FileWriter object for our FileEntry
+            fileEntry.createWriter(function (fileWriter) {
+              fileWriter.onwriteend = function (e) {
+                this.truncate(this.position); //truncate old data in file in order to overwrite all data
+                cb(false);
+                console.log('Write completed.');
+              };
+              fileWriter.onerror = function (e) {
+                cb(e);
+              };
+
+              // Create a new Blob and write it
+              var bb = new Blob([content], {type: 'application/json'});
+              fileWriter.write(bb);
+            }, cb);
+          }, cb);
         }
       };
 
