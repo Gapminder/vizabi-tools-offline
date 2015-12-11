@@ -8,11 +8,28 @@ module.exports = function (app) {
       function ($scope, $route, $routeParams, $location, vizabiItems, vizabiFactory, $window, config, readerService) {
         console.log('start controller');
         console.log(config);
-
-        var placeholder = document.getElementById('vizabi-placeholder');
+        var placeholder = document.getElementById('vizabi-placeholder1');
         var prevSlug = null;
 
-        init();
+        $scope.setTab = function(newTab){
+          $scope.currentTab = newTab;
+        };
+        $scope.lastTab = 0;
+        $scope.tabs = [];
+
+        $scope.loadingError = false;
+        $scope.tools = {};
+        $scope.validTools = [];
+
+        $scope.addTab = function() {
+          ++$scope.lastTab;
+          $scope.tabs.push({id: $scope.lastTab});
+          $scope.currentTab = $scope.lastTab;
+          setTimeout(addGraph, 1);
+        };
+
+
+        //init();
 
         if (config.isElectronApp) {
           console.log('is electron app');
@@ -58,7 +75,6 @@ module.exports = function (app) {
           $scope.loadingError = false;
           $scope.tools = {};
           $scope.validTools = [];
-          $scope.relatedItems = [];
           $scope.isWeb = !config.isElectronApp && !config.isChromeApp;
 
           //start off by getting all items
@@ -69,46 +85,46 @@ module.exports = function (app) {
           });
         }
 
-        $scope.$root.$on('$routeChangeStart', function(event, state, current){
-          var newSlug = state.params.slug;
-          if (!prevSlug) {
-            prevSlug = newSlug;
-            return;
-          }
-          if (prevSlug !== newSlug) {
-            prevSlug = newSlug;
-            // and here we go, one more hack
-            if (config.isChromeApp || config.isElectronApp) {
-              init();
-            } else {
-              setTimeout(function () {
-                window.location.reload();
-              }, 1);
-            }
-            return;
-          }
-          console.log(window.location.hash);
-        });
-        $scope.$root.$on('$routeUpdate', function(event, state){
-          var newSlug = state.params.slug;
-          if (!prevSlug) {
-            prevSlug = newSlug;
-            return;
-          }
-          if (prevSlug !== newSlug) {
-            prevSlug = newSlug;
-            // and here we go, one more hack
-            if (config.isChromeApp || config.isElectronApp) {
-              init();
-            } else {
-              setTimeout(function () {
-                window.location.reload();
-              }, 1);
-            }
-            return;
-          }
-          console.log(window.location.hash);
-        });
+        //$scope.$root.$on('$routeChangeStart', function(event, state, current){
+        //  var newSlug = state.params.slug;
+        //  if (!prevSlug) {
+        //    prevSlug = newSlug;
+        //    return;
+        //  }
+        //  if (prevSlug !== newSlug) {
+        //    prevSlug = newSlug;
+        //    // and here we go, one more hack
+        //    if (config.isChromeApp || config.isElectronApp) {
+        //      init();
+        //    } else {
+        //      setTimeout(function () {
+        //        window.location.reload();
+        //      }, 1);
+        //    }
+        //    return;
+        //  }
+        //  console.log(window.location.hash);
+        //});
+        //$scope.$root.$on('$routeUpdate', function(event, state){
+        //  var newSlug = state.params.slug;
+        //  if (!prevSlug) {
+        //    prevSlug = newSlug;
+        //    return;
+        //  }
+        //  if (prevSlug !== newSlug) {
+        //    prevSlug = newSlug;
+        //    // and here we go, one more hack
+        //    if (config.isChromeApp || config.isElectronApp) {
+        //      init();
+        //    } else {
+        //      setTimeout(function () {
+        //        window.location.reload();
+        //      }, 1);
+        //    }
+        //    return;
+        //  }
+        //  console.log(window.location.hash);
+        //});
 
         $scope.url = function(url) {
           if (config.isChromeApp || config.isElectronApp) {
@@ -119,53 +135,64 @@ module.exports = function (app) {
         };
 
         function updateGraph() {
-          var validTools = $scope.validTools;
-          if (validTools.length === 0) return;
-          if (validTools.indexOf($routeParams.slug) === -1) {
-            //redirect
-            $location.path('/' + validTools[0]);
-            return;
+          //var validTools = $scope.validTools;
+          //if (validTools.length === 0) return;
+          //if (validTools.indexOf($routeParams.slug) === -1) {
+          //  //redirect
+          //  $location.path('/' + validTools[0]);
+          //  return;
+          //}
+          //$scope.activeTool = $routeParams.slug;
+          $scope.activeTool = 'bubbles';
+          // do not put data in $scope
+          var tool = angular.copy($scope.tools[$scope.activeTool]);
+          //Vizabi.clearInstances();
+          $scope.viz = vizabiFactory.render(tool.tool, placeholder, tool.opts);
+          //$scope.$apply();
+        }
+
+        function addGraph() {
+          var tool = 'BubbleChart';
+          var opts = {
+            data: {},
+            "ui":{
+              "buttons":[
+                "find",
+                "axes",
+                "size",
+                "colors",
+                "trails",
+                "lock",
+                "moreoptions",
+                "fullscreen"
+              ],
+              "buttons_expand":[
+                "colors",
+                "find",
+                "size"
+              ]
+            }
+          };
+          var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
+
+          var dataPath;
+          var geoPath;
+          if (config.isElectronApp) {
+            var path = require('path');
+            dataPath = path.join(config.electronPath, 'client/src/public/data/data.csv');
+            geoPath = path.join(config.electronPath, 'client/src/public/data/geo.json');
+          } else if (config.isChromeApp) {
+            dataPath = chrome.runtime.getURL('data/data.csv');
+            geoPath = chrome.runtime.getURL('data/geo.json');
           }
+          opts.data.path = dataPath;
+          opts.data.geoPath = geoPath;
+          opts.data.reader = 'safe-csv';
 
-          scrollTo(document.querySelector('.wrapper'), 0, 200, function () {
-            $scope.activeTool = $routeParams.slug;
-            // do not put data in $scope
-            var tool = angular.copy($scope.tools[$scope.activeTool]);
-
-            Vizabi.clearInstances();
-
-            if (config.isChromeApp || config.isElectronApp) {
-              //set protocol
-              tool.opts.data.path = 'http:' + tool.opts.data.path;
-              for (var i=0; i < tool.relateditems.length; i++) {
-                tool.relateditems[i].image = 'http:'+tool.relateditems[i].image;
-              }
-            }
-            $scope.viz = vizabiFactory.render(tool.tool, placeholder, tool.opts);
-            $scope.relatedItems = tool.relateditems;
-            $scope.$apply();
-
-            //send to google analytics
-            if (!config.isChromeApp && !config.isElectronApp) {
-              $window.ga('send', 'pageview', {page: $location.url()});
-            }
-
-          });
+          vizabiFactory.render(tool, placeholder, opts);
         }
 
-        function scrollTo(element, to, duration, cb) {
-          if (duration < 0) return;
-          var difference = to - element.scrollTop;
-          var perTick = difference / duration * 10;
 
-          setTimeout(function () {
-            element.scrollTop = element.scrollTop + perTick;
-            if (element.scrollTop == to) {
-              cb();
-              return;
-            }
-            scrollTo(element, to, duration - 10, cb);
-          }, 10);
-        }
+
       }]);
 };

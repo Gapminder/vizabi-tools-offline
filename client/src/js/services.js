@@ -50,66 +50,7 @@ module.exports = function (app) {
            * @return {Object}
            */
           render: function (tool, placeholder, options) {
-
-            var loc = window.location.toString();
-            var hash = null;
-            console.log('loc:', loc);
-            if (config.isChromeApp || config.isElectronApp) {
-              var pos = -1;
-              var  hashtagCount = 0;
-              while ((pos = loc.indexOf('#', pos + 1)) !== -1) {
-                hashtagCount++;
-              }
-              if (hashtagCount >= 2) {
-                hash = loc.substring(loc.lastIndexOf('#') + 1);
-              }
-            } else {
-              if (loc.indexOf('#') >= 0) {
-                hash = loc.substring(loc.indexOf('#') + 1);
-              }
-            }
-
-            if (hash) {
-              console.log('hash:', hash);
-              var str = encodeURI(decodeURIComponent(hash));
-              console.log('str:', str);
-              var state = urlon.parse(str);
-              options.language = {};
-              options.language.id = state.id || 'en';
-              options.state = state;
-            }
-
-            options.bind = options.bind || {};
-            options.bind.historyUpdate = onHistoryUpdate;
-            function onHistoryUpdate(eventName, state) {
-              if (config.isChromeApp || config.isElectronApp) {
-                return;
-              }
-              formatDates(state);
-              window.location.hash = urlon.stringify(state);
-              //if hash must be in chrome app - it should be done like this,
-              //because window.location is unsupported in chrome app
-              //$location.hash(urlon.stringify(state));
-            }
-
-            if (config.isElectronApp || config.isChromeApp) {
-              var dataPath;
-              var geoPath;
-              if (config.isElectronApp) {
-                var path = require('path');
-                dataPath = path.join(config.electronPath, 'client/src/public/data/data.csv');
-                geoPath = path.join(config.electronPath, 'client/src/public/data/geo.json');
-              } else if (config.isChromeApp) {
-                dataPath = chrome.runtime.getURL('data/data.csv');
-                geoPath = chrome.runtime.getURL('data/geo.json');
-              }
-              options.data.path = dataPath
-              options.data.geoPath = geoPath;
-              options.data.reader = 'safe-csv';
-              return Vizabi(tool, placeholder, options);
-            } else {
-              return Vizabi(tool, placeholder, options);
-            }
+            return Vizabi(tool, placeholder, options);
           }
         };
       }]);
@@ -229,78 +170,6 @@ var itemXhrResult = [
     //"image":"/tools/public/images/tools/mountainchart.png",
     "image":"public/images/tools/mountainchart.png",
     "title":"Mountain Chart",
-    "relateditems":[
-      {
-        "_id":"5600af4a188967b26265a73f",
-        "_relatedTo":[
-          "55f70fd5dbbfabe3d6a2753f"
-        ],
-        "link":"http://www.gapminder.org/answers/how-many-are-rich-and-how-many-are-poor/",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=399&preset=160x96&title=media&extension=.jpg",
-        "subtitle":"Short answer — Most are in between",
-        "title":"How many are rich and how many are poor?",
-        "__v":0
-      },
-      {
-        "_id":"560061d4fc0d7c00002110a4",
-        "title":"How Reliable is the World Population Forecast?",
-        "subtitle":"Short answer — Very reliable",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=136&preset=160x96&title=media&extension=.jpg",
-        "link":"http://www.gapminder.org/answers/how-reliable-is-the-world-population-forecast/",
-        "_relatedTo":[
-          "55f71e8ccdedc1ff074e9f6d",
-          "55f70fd5dbbfabe3d6a2753f"
-        ]
-      },
-      {
-        "_id":"5600ad4c188967b26265a73b",
-        "_relatedTo":[
-          "55f71e8ccdedc1ff074e9f6d",
-          "55f70fd5dbbfabe3d6a2753f"
-        ],
-        "link":"http://www.gapminder.org/answers/will-saving-poor-children-lead-to-overpopulation/",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=409&preset=160x96&title=media&extension=.jpg",
-        "subtitle":"Short answer — No. The opposite.",
-        "title":"Will saving poor children lead to overpopulation?",
-        "__v":0
-      },
-      {
-        "_id":"5600ae2b188967b26265a73c",
-        "_relatedTo":[
-          "55f71e8ccdedc1ff074e9f6d",
-          "55f70fd5dbbfabe3d6a2753f"
-        ],
-        "link":"http://www.gapminder.org/answers/how-does-income-relate-to-life-expectancy/",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=318&preset=160x96&title=media&extension=.jpg",
-        "subtitle":"Short answer — Rich people live longer",
-        "title":" How Does Income Relate to Life Expectancy?",
-        "__v":0
-      },
-      {
-        "_id":"5600ae64188967b26265a73d",
-        "_relatedTo":[
-          "55f71e8ccdedc1ff074e9f6d",
-          "55f70fd5dbbfabe3d6a2753f"
-        ],
-        "link":"http://www.gapminder.org/answers/how-did-babies-per-woman-change-in-the-world/",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=125&preset=160x96&title=media&extension=.jpg",
-        "subtitle":"Short answer — It dropped",
-        "title":"How Did Babies per Woman Change in the World?",
-        "__v":0
-      },
-      {
-        "_id":"5600aedc188967b26265a73e",
-        "_relatedTo":[
-          "55f71e8ccdedc1ff074e9f6d",
-          "55f70fd5dbbfabe3d6a2753f"
-        ],
-        "link":"http://www.gapminder.org/posters/gapminder-world-2013/",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=209&preset=160x96&title=media&extension=.jpg",
-        "subtitle":"This chart compares Life Expectancy & GDP per capita of 182 nations in 2013.",
-        "title":"Gapminder World Poster 2013",
-        "__v":0
-      }
-    ],
     "__v":5
   },
   {
@@ -330,78 +199,6 @@ var itemXhrResult = [
       }
     },
     "tool":"BubbleChart",
-    "relateditems":[
-      {
-        "_id":"5600aedc188967b26265a73e",
-        "_relatedTo":[
-          "55f71e8ccdedc1ff074e9f6d",
-          "55f70fd5dbbfabe3d6a2753f"
-        ],
-        "link":"http://www.gapminder.org/posters/gapminder-world-2013/",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=209&preset=160x96&title=media&extension=.jpg",
-        "subtitle":"This chart compares Life Expectancy & GDP per capita of 182 nations in 2013.",
-        "title":"Gapminder World Poster 2013",
-        "__v":0
-      },
-      {
-        "_id":"5600ad4c188967b26265a73b",
-        "_relatedTo":[
-          "55f71e8ccdedc1ff074e9f6d",
-          "55f70fd5dbbfabe3d6a2753f"
-        ],
-        "link":"http://www.gapminder.org/answers/will-saving-poor-children-lead-to-overpopulation/",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=409&preset=160x96&title=media&extension=.jpg",
-        "subtitle":"Short answer — No. The opposite.",
-        "title":"Will saving poor children lead to overpopulation?",
-        "__v":0
-      },
-      {
-        "_id":"560061d4fc0d7c00002110a4",
-        "title":"How Reliable is the World Population Forecast?",
-        "subtitle":"Short answer — Very reliable",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=136&preset=160x96&title=media&extension=.jpg",
-        "link":"http://www.gapminder.org/answers/how-reliable-is-the-world-population-forecast/",
-        "_relatedTo":[
-          "55f71e8ccdedc1ff074e9f6d",
-          "55f70fd5dbbfabe3d6a2753f"
-        ]
-      },
-      {
-        "_id":"5600782dabde580e33c79e24",
-        "_relatedTo":[
-          "55f71e8ccdedc1ff074e9f6d"
-        ],
-        "link":"http://www.gapminder.org/answers/how-did-the-world-population-change/",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=247&preset=160x96&title=media&extension=.jpg",
-        "subtitle":"First slowly. Then fast.",
-        "title":"How Did The World Population Change?",
-        "__v":0
-      },
-      {
-        "_id":"5600ae2b188967b26265a73c",
-        "_relatedTo":[
-          "55f71e8ccdedc1ff074e9f6d",
-          "55f70fd5dbbfabe3d6a2753f"
-        ],
-        "link":"http://www.gapminder.org/answers/how-does-income-relate-to-life-expectancy/",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=318&preset=160x96&title=media&extension=.jpg",
-        "subtitle":"Short answer — Rich people live longer",
-        "title":" How Does Income Relate to Life Expectancy?",
-        "__v":0
-      },
-      {
-        "_id":"5600ae64188967b26265a73d",
-        "_relatedTo":[
-          "55f71e8ccdedc1ff074e9f6d",
-          "55f70fd5dbbfabe3d6a2753f"
-        ],
-        "link":"http://www.gapminder.org/answers/how-did-babies-per-woman-change-in-the-world/",
-        "image":"//cms.gapminder.org/files-api/p3media/file/image?id=125&preset=160x96&title=media&extension=.jpg",
-        "subtitle":"Short answer — It dropped",
-        "title":"How Did Babies per Woman Change in the World?",
-        "__v":0
-      }
-    ],
     "slug":"bubbles",
     //"image":"/tools/public/images/tools/bubblechart.png",
     "image": "public/images/tools/bubblechart.png",
@@ -410,4 +207,3 @@ var itemXhrResult = [
     "__v":4
   }
 ];
-var menuXhrResult;

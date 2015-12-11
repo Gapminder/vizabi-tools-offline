@@ -17,42 +17,27 @@
     <a class="header-title" href="http://www.gapminder.org">
       GAPMINDER TOOLS
     </a>
+    <a ng-click="addTab()">ADD TAB</a>
+    <ul id="tabs">
+      <li ng-repeat="tab in tabs">
+        <a ng-class="{'selected-tab': tab.id === currentTab}"
+           ng-click="setTab(tab.id)">tab #{{tab.id}}</a>
+      </li>
+    </ul>
 
     <div class="menu-mobile" ng-click="navCollapsed = !navCollapsed"  ng-class="navCollapsed ? 'open' : '' ">
       <div class="icon"></div>
     </div>
-    <ul class="nav navbar-nav navbar-nav-left desktop"
-        nav-expandable=""
-        ng-if="isWeb"
-        items="expandedItems"></ul>
-    <ul class="nav navbar-nav navbar-nav-left mobile"
-        ng-if="navCollapsed && isWeb"
-        nav-expandable=""
-        items="expandedItems"></ul>
   </div>
 
-  <!--Content-->
-  <div class="column main" id="vizabi-placeholder"></div>
+  <div ng-repeat="tab in tabs | orderBy: '-id' track by tab.id"
+       class="column main"
+       ng-show="currentTab === tab.id"
+       id="vizabi-placeholder{{tab.id}}">
+  </div>
 
   <!--More-->
   <div class="more">
-    <div ng-if="isWeb"
-         class="related">
-      <h2 class="heading-2">Related</h2>
-      <ul class="related-items">
-        <li class="related-item" ng-repeat="(key, related) in relatedItems track by $index">
-          <a href="{{::related.link}}">
-            <div class="related-item-thumbnail">
-              <img ng-src="{{::related.image}}">
-            </div>
-            <div class="related-item-info">
-              <span class="title">{{::related.title}}</span>
-              <span class="subtitle">{{::related.subtitle}}</span>
-            </div>
-          </a>
-        </li>
-      </ul>
-    </div>
     <div class="about">
       <h2 class="heading-2">See also</h2>
 

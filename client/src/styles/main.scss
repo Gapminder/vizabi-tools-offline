@@ -56,6 +56,27 @@ body {
   visibility: hidden;
 }
 
+ul#tabs {
+  padding: 0;
+}
+
+ul#tabs li {
+  display: inline;
+}
+
+ul#tabs li a {
+  padding: 10px 20px;
+  text-decoration: none;
+}
+
+ul#tabs li a:hover {
+  background-color: orange;
+}
+
+.selected-tab {
+  background-color: darkorange;
+}
+
 @import 'header';
 @import 'menu';
 @import 'loader';
