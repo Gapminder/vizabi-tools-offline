@@ -73,6 +73,10 @@ ul#tabs li a:hover {
   background-color: orange;
 }
 
+.selected-tab {
+  background-color: darkorange;
+}
+
 @import 'header';
 @import 'menu';
 @import 'loader';

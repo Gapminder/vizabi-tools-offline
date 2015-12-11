@@ -17,37 +17,24 @@
     <a class="header-title" href="http://www.gapminder.org">
       GAPMINDER TOOLS
     </a>
+    <a ng-click="addTab()">ADD TAB</a>
     <ul id="tabs">
-      <li>
-        <a href ng-click="setTab(1)">first</a>
-      </li>
-      <li>
-        <a href ng-click="setTab(2)">second</a>
+      <li ng-repeat="tab in tabs">
+        <a ng-class="{'selected-tab': tab.id === currentTab}"
+           ng-click="setTab(tab.id)">tab #{{tab.id}}</a>
       </li>
     </ul>
 
     <div class="menu-mobile" ng-click="navCollapsed = !navCollapsed"  ng-class="navCollapsed ? 'open' : '' ">
       <div class="icon"></div>
     </div>
-    <ul class="nav navbar-nav navbar-nav-left desktop"
-        nav-expandable=""
-        ng-if="isWeb"
-        items="expandedItems"></ul>
-    <ul class="nav navbar-nav navbar-nav-left mobile"
-        ng-if="navCollapsed && isWeb"
-        nav-expandable=""
-        items="expandedItems"></ul>
   </div>
-  <span ng-click="addGraph1()">add graph1</span>
-  <span ng-click="addGraph2()">add graph2</span>
 
-  <div ng-show="tab === 1" class="column main" id="vizabi-placeholder1"></div>
-  <div ng-show="tab === 2" class="column main" id="vizabi-placeholder2"></div>
-  <!--<div ng-show="tab === 2">-->
-    <!--nothing-->
-  <!--</div>-->
-  <!--Content-->
-  <!--<div class="column main" id="vizabi-placeholder"></div>-->
+  <div ng-repeat="tab in tabs | orderBy: '-id' track by tab.id"
+       class="column main"
+       ng-show="currentTab === tab.id"
+       id="vizabi-placeholder{{tab.id}}">
+  </div>
 
   <!--More-->
   <div class="more">

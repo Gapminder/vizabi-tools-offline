@@ -8,14 +8,26 @@ module.exports = function (app) {
       function ($scope, $route, $routeParams, $location, vizabiItems, vizabiFactory, $window, config, readerService) {
         console.log('start controller');
         console.log(config);
-
         var placeholder = document.getElementById('vizabi-placeholder1');
         var prevSlug = null;
 
-        $scope.tab = 1;
         $scope.setTab = function(newTab){
-          $scope.tab = newTab;
+          $scope.currentTab = newTab;
         };
+        $scope.lastTab = 0;
+        $scope.tabs = [];
+
+        $scope.loadingError = false;
+        $scope.tools = {};
+        $scope.validTools = [];
+
+        $scope.addTab = function() {
+          ++$scope.lastTab;
+          $scope.tabs.push({id: $scope.lastTab});
+          $scope.currentTab = $scope.lastTab;
+          setTimeout(addGraph, 1);
+        };
+
 
         //init();
 
@@ -123,7 +135,6 @@ module.exports = function (app) {
         };
 
         function updateGraph() {
-          debugger;
           //var validTools = $scope.validTools;
           //if (validTools.length === 0) return;
           //if (validTools.indexOf($routeParams.slug) === -1) {
@@ -140,42 +151,48 @@ module.exports = function (app) {
           //$scope.$apply();
         }
 
-        $scope.addGraph1 = addGraph1;
-        $scope.addGraph2 = addGraph2;
-        $scope.loadingError = false;
-        $scope.tools = {};
-        $scope.validTools = [];
+        function addGraph() {
+          var tool = 'BubbleChart';
+          var opts = {
+            data: {},
+            "ui":{
+              "buttons":[
+                "find",
+                "axes",
+                "size",
+                "colors",
+                "trails",
+                "lock",
+                "moreoptions",
+                "fullscreen"
+              ],
+              "buttons_expand":[
+                "colors",
+                "find",
+                "size"
+              ]
+            }
+          };
+          var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
 
-        function addGraph1() {
-          debugger;
-          console.log('add graph');
-          $scope.loadingError = false;
-          //$scope.tools = {};
-          //$scope.validTools = [];
-          placeholder = document.getElementById('vizabi-placeholder1');
+          var dataPath;
+          var geoPath;
+          if (config.isElectronApp) {
+            var path = require('path');
+            dataPath = path.join(config.electronPath, 'client/src/public/data/data.csv');
+            geoPath = path.join(config.electronPath, 'client/src/public/data/geo.json');
+          } else if (config.isChromeApp) {
+            dataPath = chrome.runtime.getURL('data/data.csv');
+            geoPath = chrome.runtime.getURL('data/geo.json');
+          }
+          opts.data.path = dataPath;
+          opts.data.geoPath = geoPath;
+          opts.data.reader = 'safe-csv';
 
-          //updateGraph();
-          vizabiItems.getItems().then(function (items) {
-            $scope.tools = items;
-            $scope.validTools = Object.keys($scope.tools);
-            updateGraph();
-          });
+          vizabiFactory.render(tool, placeholder, opts);
         }
 
-        function addGraph2() {
-          debugger;
-          console.log('add graph');
-          $scope.loadingError = false;
-          //$scope.tools = {};
-          //$scope.validTools = [];
-          placeholder = document.getElementById('vizabi-placeholder2');
 
-          //updateGraph();
-          vizabiItems.getItems().then(function (items) {
-            $scope.tools = items;
-            $scope.validTools = Object.keys($scope.tools);
-            updateGraph();
-          });
-        }
+
       }]);
 };

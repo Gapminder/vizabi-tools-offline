@@ -50,67 +50,7 @@ module.exports = function (app) {
            * @return {Object}
            */
           render: function (tool, placeholder, options) {
-            debugger;
-            var loc = window.location.toString();
-            var hash = null;
-            console.log('loc:', loc);
-            //if (config.isChromeApp || config.isElectronApp) {
-            //  var pos = -1;
-            //  var  hashtagCount = 0;
-            //  while ((pos = loc.indexOf('#', pos + 1)) !== -1) {
-            //    hashtagCount++;
-            //  }
-            //  if (hashtagCount >= 2) {
-            //    hash = loc.substring(loc.lastIndexOf('#') + 1);
-            //  }
-            //} else {
-            //  if (loc.indexOf('#') >= 0) {
-            //    hash = loc.substring(loc.indexOf('#') + 1);
-            //  }
-            //}
-            //
-            //if (hash) {
-            //  console.log('hash:', hash);
-            //  var str = encodeURI(decodeURIComponent(hash));
-            //  console.log('str:', str);
-            //  var state = urlon.parse(str);
-            //  options.language = {};
-            //  options.language.id = state.id || 'en';
-            //  options.state = state;
-            //}
-
-            //options.bind = options.bind || {};
-            //options.bind.historyUpdate = onHistoryUpdate;
-            //function onHistoryUpdate(eventName, state) {
-            //  if (config.isChromeApp || config.isElectronApp) {
-            //    return;
-            //  }
-            //  formatDates(state);
-            //  window.location.hash = urlon.stringify(state);
-            //  //if hash must be in chrome app - it should be done like this,
-            //  //because window.location is unsupported in chrome app
-            //  //$location.hash(urlon.stringify(state));
-            //}
-
-            if (config.isElectronApp || config.isChromeApp) {
-              var dataPath;
-              var geoPath;
-              if (config.isElectronApp) {
-                var path = require('path');
-                dataPath = path.join(config.electronPath, 'client/src/public/data/data.csv');
-                geoPath = path.join(config.electronPath, 'client/src/public/data/geo.json');
-              } else if (config.isChromeApp) {
-                dataPath = chrome.runtime.getURL('data/data.csv');
-                geoPath = chrome.runtime.getURL('data/geo.json');
-              }
-              options.data.path = dataPath;
-              options.data.geoPath = geoPath;
-              options.data.reader = 'safe-csv';
-              //Vizabi(tool, document.getElementById('vizabi-placeholder2'), options);
-              return Vizabi(tool, placeholder, options);
-            } else {
-              return Vizabi(tool, placeholder, options);
-            }
+            return Vizabi(tool, placeholder, options);
           }
         };
       }]);
