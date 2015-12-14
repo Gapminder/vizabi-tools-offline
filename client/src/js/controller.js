@@ -4,15 +4,31 @@ var async = require('async');
 module.exports = function (app) {
   app
     .controller('gapminderToolsCtrl', [
-      '$scope', '$route', '$routeParams', '$location', 'vizabiItems', 'vizabiFactory', '$window', 'config', 'readerService',
-      function ($scope, $route, $routeParams, $location, vizabiItems, vizabiFactory, $window, config, readerService) {
+      '$scope', '$route', '$routeParams', '$location', 'vizabiItems',
+      'vizabiFactory', '$window', 'config', 'readerService', 'BookmarksService',
+      function ($scope, $route, $routeParams, $location, vizabiItems, vizabiFactory,
+                $window, config, readerService, BookmarksService) {
         console.log('start controller');
         console.log(config);
         var placeholder = document.getElementById('vizabi-placeholder1');
-        var prevSlug = null;
+        var bookmarks = new BookmarksService(readerService);
 
-        $scope.setTab = function(newTab){
-          $scope.currentTab = newTab;
+        setTimeout(function(){
+          bookmarks.getAll(function(err, bookmarks) {
+            if(err) {
+              console.log(err);
+            }
+            console.log('get all result');
+            console.log(bookmarks);
+            $scope.favorites = bookmarks;
+            $scope.$apply();
+          });
+        }, 100);
+
+        $scope.setTab = function(tabId) {
+          $scope.currentTab = tabId;
+          //set current graph
+          $scope.selectedGraph = _.result(_.find($scope.tabs, { id: tabId}), 'graphName');
         };
         $scope.lastTab = 0;
         $scope.tabs = [];
@@ -21,15 +37,30 @@ module.exports = function (app) {
         $scope.tools = {};
         $scope.validTools = [];
 
-        $scope.addTab = function() {
+        $scope.favorites = {};
+        $scope.selectedGraph = null;
+
+        $scope.addTab = function(graph) {
+          graph = $scope.graphs[graph];
           ++$scope.lastTab;
-          $scope.tabs.push({id: $scope.lastTab});
+          $scope.tabs.push({
+            id: $scope.lastTab,
+            graphName: graph.name
+          });
           $scope.currentTab = $scope.lastTab;
-          setTimeout(addGraph, 1);
+          setTimeout(function(){
+            addGraph(graph)
+          }, 1);
         };
 
+        $scope.addToFavorites = function(graphName) {
+          $scope.favorites[graphName] = $scope.graphs[graphName];
+          bookmarks.add($scope.graphs[graphName]);
+        };
 
-        //init();
+        $scope.removeFromFavorites = function(graphName) {
+          delete $scope.favorites[graphName];
+        };
 
         if (config.isElectronApp) {
           console.log('is electron app');
@@ -85,47 +116,6 @@ module.exports = function (app) {
           });
         }
 
-        //$scope.$root.$on('$routeChangeStart', function(event, state, current){
-        //  var newSlug = state.params.slug;
-        //  if (!prevSlug) {
-        //    prevSlug = newSlug;
-        //    return;
-        //  }
-        //  if (prevSlug !== newSlug) {
-        //    prevSlug = newSlug;
-        //    // and here we go, one more hack
-        //    if (config.isChromeApp || config.isElectronApp) {
-        //      init();
-        //    } else {
-        //      setTimeout(function () {
-        //        window.location.reload();
-        //      }, 1);
-        //    }
-        //    return;
-        //  }
-        //  console.log(window.location.hash);
-        //});
-        //$scope.$root.$on('$routeUpdate', function(event, state){
-        //  var newSlug = state.params.slug;
-        //  if (!prevSlug) {
-        //    prevSlug = newSlug;
-        //    return;
-        //  }
-        //  if (prevSlug !== newSlug) {
-        //    prevSlug = newSlug;
-        //    // and here we go, one more hack
-        //    if (config.isChromeApp || config.isElectronApp) {
-        //      init();
-        //    } else {
-        //      setTimeout(function () {
-        //        window.location.reload();
-        //      }, 1);
-        //    }
-        //    return;
-        //  }
-        //  console.log(window.location.hash);
-        //});
-
         $scope.url = function(url) {
           if (config.isChromeApp || config.isElectronApp) {
             $location.path(url);
@@ -151,30 +141,15 @@ module.exports = function (app) {
           //$scope.$apply();
         }
 
-        function addGraph() {
-          var tool = 'BubbleChart';
-          var opts = {
-            data: {},
-            "ui":{
-              "buttons":[
-                "find",
-                "axes",
-                "size",
-                "colors",
-                "trails",
-                "lock",
-                "moreoptions",
-                "fullscreen"
-              ],
-              "buttons_expand":[
-                "colors",
-                "find",
-                "size"
-              ]
-            }
-          };
+        function addGraph(graph) {
           var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
+          vizabiFactory.render(graph.tool, placeholder, graph.opts);
+        }
 
+        $scope.graphs = getAvailableGraphsList();
+
+        function getAvailableGraphsList() {
+          var graphsHash = {};
           var dataPath;
           var geoPath;
           if (config.isElectronApp) {
@@ -185,14 +160,39 @@ module.exports = function (app) {
             dataPath = chrome.runtime.getURL('data/data.csv');
             geoPath = chrome.runtime.getURL('data/geo.json');
           }
-          opts.data.path = dataPath;
-          opts.data.geoPath = geoPath;
-          opts.data.reader = 'safe-csv';
-
-          vizabiFactory.render(tool, placeholder, opts);
+          for (var i=1; i<=10; i++) {
+            graphsHash['test-graph-' + i] = {
+              name: 'test-graph-' + i,
+              tool: 'BubbleChart',
+              opts: {
+                data: {
+                  path:dataPath,
+                  geoPath: geoPath,
+                  reader: 'safe-csv'
+                },
+                ui: {
+                  "buttons":[
+                    "find",
+                    "axes",
+                    "size",
+                    "colors",
+                    "trails",
+                    "lock",
+                    "moreoptions",
+                    "fullscreen"
+                  ],
+                  "buttons_expand":[
+                    "colors",
+                    "find",
+                    "size"
+                  ]
+                }
+              }
+            };
+          }
+          console.log('return;');
+          console.log(graphsHash);
+          return graphsHash;
         }
-
-
-
       }]);
 };

@@ -74,6 +74,8 @@ module.exports = function (app) {
         },
         //read file from chrome file system
         getChromeFsFile: function(name, isCreate, cb) {
+          console.log('getChromeFsFile');
+          console.log(config);
           config.fileSystem.root.getFile(name, {create: isCreate}, function (fileEntry) {
             fileEntry.file(function (file) {
               var reader = new FileReader();
@@ -88,9 +90,13 @@ module.exports = function (app) {
           config.fileSystem.root.getFile(name, {create: true}, function (fileEntry) {
             // Create a FileWriter object for our FileEntry
             fileEntry.createWriter(function (fileWriter) {
+              var truncated = false;
               fileWriter.onwriteend = function (e) {
-                this.truncate(this.position); //truncate old data in file in order to overwrite all data
-                cb(false);
+                if (!truncated) {
+                  truncated = true;
+                  this.truncate(this.position); //truncate old data in file in order to overwrite all data
+                  return cb(false);
+                }
                 console.log('Write completed.');
               };
               fileWriter.onerror = function (e) {

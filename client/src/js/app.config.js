@@ -26,8 +26,6 @@ module.exports = function (app) {
           config.fileSystem = fs;
         }
 
-
-
         var currentImgSrcSanitizationWhitelist = $compileProvider.imgSrcSanitizationWhitelist();
         var newImgSrcSanitizationWhiteList = currentImgSrcSanitizationWhitelist.toString().slice(0,-1)
           + '|chrome-extension:'

@@ -22,3 +22,4 @@ require('./directives')(app);
 require('./services')(app);
 require('./combineDataService')(app);
 require('./readerService')(app);
+require('./bookmarksService')(app);

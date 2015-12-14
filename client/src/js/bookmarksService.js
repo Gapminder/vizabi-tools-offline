@@ -1,6 +1,6 @@
 module.exports = function (app) {
   app
-    .factory('bookmarksService', ['config', 'readerService', function (config) {
+    .factory('BookmarksService', ['config', 'readerService', function (config) {
       function Bookmarks(reader) {
         this.bookmarks = null;
         this.reader = reader;
@@ -11,20 +11,27 @@ module.exports = function (app) {
         if (this.bookmarks) {
           return cb(null, this.bookmarks);
         }
-
+        console.log('get all');
         this.reader.getChromeFsFile(this.name, true, function(err, bookmarks) {
           if (err) {
             return cb(err);
           }
           //todo: parse json?
-          this.bookmarks = bookmarks;
+          if (bookmarks !== '') {
+            this.bookmarks = JSON.parse(bookmarks);
+          } else {
+            this.bookmarks = {};
+          }
           cb(err, this.bookmarks);
         });
       };
 
       Bookmarks.prototype.add = function(bookmark) {
-        this.bookmarks.push(bookmark);
-        this.reader.writeChromeFsFile(this.name, this.bookmarks, function(err) {
+        if (!this.bookmarks) {
+          this.bookmarks = {};
+        }
+        this.bookmarks[bookmark.name] = bookmark;
+        this.reader.writeChromeFsFile(this.name, JSON.stringify(this.bookmarks), function(err) {
           if (err) {
             console.log('add bookmark error');
           }

@@ -194,6 +194,9 @@ var chromeAppOptions = {
       template: path.join(config.src, config.template),
       chunks: ['angular', 'vizabi-tools'],
       minify: false
+    }),
+    new webpack.ProvidePlugin({
+      _: 'lodash'
     })
   ]
 };
