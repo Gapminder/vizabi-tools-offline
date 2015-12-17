@@ -19,23 +19,22 @@ module.exports = function (app) {
     .config(['$routeProvider', '$locationProvider', '$compileProvider', 'config',
     function ($routeProvider, $locationProvider, $compileProvider, config) {
       //add chrome-extension protocol to angular's images whitelist regular expression
-      if (config.isChromeApp || config.isElectronApp) {
+      if (config.isChromeApp) {
         window.webkitRequestFileSystem(window.PERSISTEN, 1024, onInitFs, function(err) {if(err) {console.log(err)}});//request storage
         function onInitFs(fs) {
-          console.log('on initfs');
           config.fileSystem = fs;
         }
-
-        var currentImgSrcSanitizationWhitelist = $compileProvider.imgSrcSanitizationWhitelist();
-        var newImgSrcSanitizationWhiteList = currentImgSrcSanitizationWhitelist.toString().slice(0,-1)
-          + '|chrome-extension:'
-          + '|filesystem:'
-          + '|file:'
-          +currentImgSrcSanitizationWhitelist.toString().slice(-1);
-
-        $compileProvider.imgSrcSanitizationWhitelist(newImgSrcSanitizationWhiteList);
-        $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
       }
+
+      var currentImgSrcSanitizationWhitelist = $compileProvider.imgSrcSanitizationWhitelist();
+      var newImgSrcSanitizationWhiteList = currentImgSrcSanitizationWhitelist.toString().slice(0,-1)
+        + '|chrome-extension:'
+        + '|filesystem:'
+        + '|file:'
+        +currentImgSrcSanitizationWhitelist.toString().slice(-1);
+
+      $compileProvider.imgSrcSanitizationWhitelist(newImgSrcSanitizationWhiteList);
+      $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
 
       $routeProvider
         .when('/:slug', {
@@ -46,13 +45,13 @@ module.exports = function (app) {
           redirectTo: '/bubbles',
           reloadOnSearch: false
         });
-      //Packaged apps aren't websites(it is not supported history API), so we have to use Hashbang mode(#)
-      if (!config.isChromeApp && !config.isElectronApp) {
-        $locationProvider.html5Mode({
-          enabled: true,
-          requireBase: false
-        });
-      }
+    }])
+    .run(['$rootScope', function($rootScope) {
+      $rootScope.safeApply = function(){
+        if (!$rootScope.$$phase){
+          $rootScope.$apply.apply(this, arguments);
+        }
+      };
     }])
 
 };

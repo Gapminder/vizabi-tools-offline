@@ -18,7 +18,6 @@ var app = angular.module('gapminderTools', [ngRoute, ngTouch], ['$provide', func
 
 require('./app.config')(app);
 require('./controller')(app);
-require('./directives')(app);
 require('./services')(app);
 require('./combineDataService')(app);
 require('./readerService')(app);

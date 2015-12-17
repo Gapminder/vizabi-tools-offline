@@ -4,26 +4,22 @@ var async = require('async');
 module.exports = function (app) {
   app
     .controller('gapminderToolsCtrl', [
-      '$scope', '$route', '$routeParams', '$location', 'vizabiItems',
+      '$scope', '$route', '$routeParams', '$location',
       'vizabiFactory', '$window', 'config', 'readerService', 'BookmarksService',
-      function ($scope, $route, $routeParams, $location, vizabiItems, vizabiFactory,
+      function ($scope, $route, $routeParams, $location,  vizabiFactory,
                 $window, config, readerService, BookmarksService) {
-        console.log('start controller');
-        console.log(config);
         var placeholder = document.getElementById('vizabi-placeholder1');
         var bookmarks = new BookmarksService(readerService);
 
-        setTimeout(function(){
+        setTimeout(function() {
           bookmarks.getAll(function(err, bookmarks) {
             if(err) {
-              console.log(err);
+              console.log('get bookmarks error', err);
             }
-            console.log('get all result');
-            console.log(bookmarks);
             $scope.favorites = bookmarks;
-            $scope.$apply();
+            $scope.safeApply();
           });
-        }, 100);
+        }, 500);
 
         $scope.setTab = function(tabId) {
           $scope.currentTab = tabId;
@@ -40,27 +36,25 @@ module.exports = function (app) {
         $scope.favorites = {};
         $scope.selectedGraph = null;
 
+        $scope.graphs = getAvailableGraphsList();
+
+        //graph - graph name
         $scope.addTab = function(graph) {
           graph = $scope.graphs[graph];
           ++$scope.lastTab;
+          //add new tab
           $scope.tabs.push({
             id: $scope.lastTab,
             graphName: graph.name
           });
           $scope.currentTab = $scope.lastTab;
           setTimeout(function(){
+            //add graph to that tab
             addGraph(graph)
           }, 1);
         };
 
-        $scope.addToFavorites = function(graphName) {
-          $scope.favorites[graphName] = $scope.graphs[graphName];
-          bookmarks.add($scope.graphs[graphName]);
-        };
 
-        $scope.removeFromFavorites = function(graphName) {
-          delete $scope.favorites[graphName];
-        };
 
         if (config.isElectronApp) {
           console.log('is electron app');
@@ -102,52 +96,26 @@ module.exports = function (app) {
           });
         }
 
-        function init() {
-          $scope.loadingError = false;
-          $scope.tools = {};
-          $scope.validTools = [];
-          $scope.isWeb = !config.isElectronApp && !config.isChromeApp;
-
-          //start off by getting all items
-          vizabiItems.getItems().then(function (items) {
-            $scope.tools = items;
-            $scope.validTools = Object.keys($scope.tools);
-            updateGraph();
-          });
-        }
-
-        $scope.url = function(url) {
-          if (config.isChromeApp || config.isElectronApp) {
-            $location.path(url);
-          } else {
-            $window.location.href = url;
-          }
+        $scope.addToFavorites = function(graphName) {
+          $scope.favorites[graphName] = $scope.graphs[graphName];
+          bookmarks.add($scope.graphs[graphName]);
         };
 
-        function updateGraph() {
-          //var validTools = $scope.validTools;
-          //if (validTools.length === 0) return;
-          //if (validTools.indexOf($routeParams.slug) === -1) {
-          //  //redirect
-          //  $location.path('/' + validTools[0]);
-          //  return;
-          //}
-          //$scope.activeTool = $routeParams.slug;
-          $scope.activeTool = 'bubbles';
-          // do not put data in $scope
-          var tool = angular.copy($scope.tools[$scope.activeTool]);
-          //Vizabi.clearInstances();
-          $scope.viz = vizabiFactory.render(tool.tool, placeholder, tool.opts);
-          //$scope.$apply();
-        }
+        $scope.removeFromFavorites = function(graphName) {
+          delete $scope.favorites[graphName];
+        };
+
+        //change location for the chrome and the electron apps
+        $scope.url = function(url) {
+          $location.path(url);
+        };
 
         function addGraph(graph) {
           var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
           vizabiFactory.render(graph.tool, placeholder, graph.opts);
         }
 
-        $scope.graphs = getAvailableGraphsList();
-
+        //compose test data for graphs
         function getAvailableGraphsList() {
           var graphsHash = {};
           var dataPath;
@@ -190,8 +158,6 @@ module.exports = function (app) {
               }
             };
           }
-          console.log('return;');
-          console.log(graphsHash);
           return graphsHash;
         }
       }]);
