@@ -25,7 +25,7 @@
     <span>List of favorites:</span>
     <select ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
       <option value="">choose graph</option>
-      <option ng-repeat="graph in favorites">{{graph.name}}</option>
+      <option ng-repeat="graph in favorites" value="{{graph.name}}">{{graph.bookmarkName}}</option>
     </select>
     <ul id="tabs">
       <li ng-repeat="tab in tabs">
@@ -40,8 +40,10 @@
     </div>
   </div>
 
-<button ng-show="!favorites[selectedGraph]"
-        ng-click="addToFavorites(selectedGraph)">add to favorites</button>
+<!--<button ng-show="!favorites[selectedGraph]"-->
+        <!--ng-click="addToFavorites(selectedGraph)">add to favorites</button>-->
+  <button ng-show="!favorites[selectedGraph]"
+          ng-click="clickToOpen(selectedGraph)">add to favorites</button>
 <button ng-show="favorites[selectedGraph]"
         ng-click="removeFromFavorites(selectedGraph)">remove from favorites</button>
 
@@ -77,6 +79,14 @@
 
   <h2>Ops! Something went terribly wrong</h2>
 </div>
+
+<script type="text/ng-template" id="newBookmark.html">
+  <div>
+    <h1>bookmark name</h1>
+    <input type="text" ng-model="newBookmark.bookmarkName">
+    <button ng-click="saveNewBookmark() && closeThisDialog()">add</button>
+  </div>
+</script>
 
 {% for (var chunk in o.htmlWebpackPlugin.files.js) { %}
 <script src="{%=o.htmlWebpackPlugin.files.js[chunk]%}"  charset="utf-8"></script>

@@ -5,9 +5,9 @@ module.exports = function (app) {
   app
     .controller('gapminderToolsCtrl', [
       '$scope', '$route', '$routeParams', '$location',
-      'vizabiFactory', '$window', 'config', 'readerService', 'BookmarksService',
+      'vizabiFactory', '$window', 'config', 'readerService', 'BookmarksService', 'ngDialog',
       function ($scope, $route, $routeParams, $location,  vizabiFactory,
-                $window, config, readerService, BookmarksService) {
+                $window, config, readerService, BookmarksService, ngDialog) {
         var placeholder = document.getElementById('vizabi-placeholder1');
         var bookmarks = new BookmarksService(readerService);
 
@@ -16,8 +16,8 @@ module.exports = function (app) {
             if(err) {
               console.log('get bookmarks error', err);
             }
-            $scope.favorites = bookmarks;
-            $scope.safeApply();
+            //$scope.favorites = bookmarks;
+            //$scope.safeApply();
           });
         }, 500);
 
@@ -29,7 +29,7 @@ module.exports = function (app) {
         $scope.tools = {};
         $scope.validTools = [];
 
-        $scope.favorites = {};
+        $scope.favorites = [];
         $scope.selectedGraph = null;
 
         $scope.graphs = getAvailableGraphsList();
@@ -106,6 +106,21 @@ module.exports = function (app) {
             return promise;
           });
         }
+
+        $scope.clickToOpen = function (graphName) {
+          $scope.newBookmark = {name: graphName};
+          $scope.saveNewBookmark = function() {
+            console.log($scope.newBookmark);
+            $scope.favorites.push($scope.newBookmark);
+            //bookmarks.add($scope.graphs[$scope.newBookmark]);
+            return true;
+          };
+          ngDialog.open({
+            template: 'newBookmark.html',
+            scope: $scope
+          });
+        };
+
 
         $scope.addToFavorites = function(graphName) {
           $scope.favorites[graphName] = $scope.graphs[graphName];
