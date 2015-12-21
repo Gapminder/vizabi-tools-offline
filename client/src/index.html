@@ -17,19 +17,21 @@
     <a class="header-title" href="http://www.gapminder.org">
       GAPMINDER TOOLS
     </a>
-    <select ng-model="selectedGraph" ng-change="addTab(selectedGraph)">
+    <button ng-click="newTab()">new tab</button>
+    <select ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
       <option value="">choose graph</option>
       <option ng-repeat="graph in graphs">{{graph.name}}</option>
     </select>
     <span>List of favorites:</span>
-    <select ng-model="selectedGraph" ng-change="addTab(selectedGraph)">
+    <select ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
       <option value="">choose graph</option>
       <option ng-repeat="graph in favorites">{{graph.name}}</option>
     </select>
     <ul id="tabs">
       <li ng-repeat="tab in tabs">
         <a ng-class="{'selected-tab': tab.id === currentTab}"
-           ng-click="setTab(tab.id)">tab #{{tab.id}}</a>
+           ng-click="setTab(tab.id)">tab #{{tab.id}} <a ng-click="closeTab(tab.id)">X</a>
+        </a>
       </li>
     </ul>
 
@@ -37,6 +39,7 @@
       <div class="icon"></div>
     </div>
   </div>
+
 <button ng-show="!favorites[selectedGraph]"
         ng-click="addToFavorites(selectedGraph)">add to favorites</button>
 <button ng-show="favorites[selectedGraph]"

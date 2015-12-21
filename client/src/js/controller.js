@@ -21,12 +21,8 @@ module.exports = function (app) {
           });
         }, 500);
 
-        $scope.setTab = function(tabId) {
-          $scope.currentTab = tabId;
-          //set current graph
-          $scope.selectedGraph = _.result(_.find($scope.tabs, { id: tabId}), 'graphName');
-        };
-        $scope.lastTab = 0;
+
+        $scope.lastTab = -1;
         $scope.tabs = [];
 
         $scope.loadingError = false;
@@ -38,23 +34,38 @@ module.exports = function (app) {
 
         $scope.graphs = getAvailableGraphsList();
 
-        //graph - graph name
-        $scope.addTab = function(graph) {
-          graph = $scope.graphs[graph];
-          ++$scope.lastTab;
-          //add new tab
-          $scope.tabs.push({
-            id: $scope.lastTab,
-            graphName: graph.name
-          });
-          $scope.currentTab = $scope.lastTab;
-          setTimeout(function(){
-            //add graph to that tab
-            addGraph(graph)
-          }, 1);
+        $scope.setTab = function(tabId) {
+          $scope.currentTab = tabId;
+          $scope.selectedGraph = _.findWhere($scope.tabs, {id: tabId}).graphName;
         };
 
+        $scope.openGraph = function(graphName) {
+          if ($scope.tabs.length === 0) {
+            $scope.newTab();
+          }
+          setTimeout(function(){
+            var graph = $scope.graphs[graphName];
+            var tabIndex = $scope.tabs.map(function(el) {
+              return el.id;
+            }).indexOf($scope.currentTab);
+            $scope.tabs[tabIndex].graphName = graph.name;
+            $scope.selectedGraph = graph.name;
+            renderGraph(graph);
+          }, 10);
+        };
 
+        $scope.newTab = function() {
+          ++$scope.lastTab;
+          $scope.tabs.push({id: $scope.lastTab});
+          $scope.setTab($scope.lastTab);
+        };
+
+        $scope.closeTab = function(tabId) {
+          if (tabId === $scope.currentTab) {
+            --$scope.currentTab;
+          }
+          $scope.tabs = _.without($scope.tabs, _.findWhere($scope.tabs, {id: tabId}));
+        };
 
         if (config.isElectronApp) {
           console.log('is electron app');
@@ -110,7 +121,7 @@ module.exports = function (app) {
           $location.path(url);
         };
 
-        function addGraph(graph) {
+        function renderGraph(graph) {
           var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
           vizabiFactory.render(graph.tool, placeholder, graph.opts);
         }
