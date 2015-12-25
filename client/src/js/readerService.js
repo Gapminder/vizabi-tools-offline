@@ -108,8 +108,38 @@ module.exports = function (app) {
               fileWriter.write(bb);
             }, cb);
           }, cb);
+        },
+        getGraphsList: function(cb) {
+          if (config.isChromeApp) {
+            chrome.runtime.getPackageDirectoryEntry(function(dirEntry) {
+              dirEntry.getDirectory('data/graphs', {}, function(dataDirectory){
+                var dirReader = dataDirectory.createReader();
+                var entries = [];
+
+                function readEntries() {
+                  dirReader.readEntries(function(results) {
+                    if (!results.length) {
+                      cb(null, entries.sort());
+                    } else {
+                      entries = entries.concat(toArray(results));
+                      readEntries();
+                    }
+                  }, cb)
+                };
+
+                readEntries();
+
+                function toArray(list) {
+                  return Array.prototype.slice.call(list || [], 0);
+                }
+              });
+            });
+          }
+
+          if (config.isElectronApp) {
+            //todo: use node fs module
+          }
         }
       };
-
     }]);
 };

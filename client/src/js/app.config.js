@@ -5,7 +5,8 @@ module.exports = function (app) {
     isChromeApp: isChromeApp,
     isElectronApp: isElectronApp,
     apiUrl: (isChromeApp || isElectronApp) ? 'http://localhost:3001/tools/api' : 'http://localhost:8080/tools/api',
-    fileSystem: null
+    fileSystem: null,
+    graphsDir: 'data/graphs/'
   };
 
   if (isElectronApp) {
@@ -19,12 +20,7 @@ module.exports = function (app) {
     .config(['$routeProvider', '$locationProvider', '$compileProvider', 'config',
     function ($routeProvider, $locationProvider, $compileProvider, config) {
       //add chrome-extension protocol to angular's images whitelist regular expression
-      if (config.isChromeApp) {
-        window.webkitRequestFileSystem(window.PERSISTEN, 1024, onInitFs, function(err) {if(err) {console.log(err)}});//request storage
-        function onInitFs(fs) {
-          config.fileSystem = fs;
-        }
-      }
+
 
       var currentImgSrcSanitizationWhitelist = $compileProvider.imgSrcSanitizationWhitelist();
       var newImgSrcSanitizationWhiteList = currentImgSrcSanitizationWhitelist.toString().slice(0,-1)

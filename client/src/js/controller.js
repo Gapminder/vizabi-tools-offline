@@ -11,61 +11,9 @@ module.exports = function (app) {
         var placeholder = document.getElementById('vizabi-placeholder1');
         var bookmarks = new BookmarksService(readerService);
 
-        setTimeout(function() {
-          bookmarks.getAll(function(err, bookmarks) {
-            if(err) {
-              console.log('get bookmarks error', err);
-            }
-            $scope.favorites = bookmarks;
-            $scope.safeApply();
-          });
-        }, 500);
-
-
-        $scope.lastTab = -1;
-        $scope.tabs = [];
-
-        $scope.loadingError = false;
-        $scope.tools = {};
-        $scope.validTools = [];
-
-        $scope.favorites = {};
-        $scope.selectedGraph = null;
-
-        $scope.graphs = getAvailableGraphsList();
-
-        $scope.setTab = function(tabId) {
-          $scope.currentTab = tabId;
-          $scope.selectedGraph = _.findWhere($scope.tabs, {id: tabId}).graphName;
-        };
-
-        $scope.openGraph = function(graphName) {
-          if ($scope.tabs.length === 0) {
-            $scope.newTab();
-          }
-          setTimeout(function(){
-            var graph = $scope.graphs[graphName];
-            var tabIndex = $scope.tabs.map(function(el) {
-              return el.id;
-            }).indexOf($scope.currentTab);
-            $scope.tabs[tabIndex].graphName = graph.name;
-            $scope.selectedGraph = graph.name;
-            renderGraph(graph);
-          }, 10);
-        };
-
-        $scope.newTab = function() {
-          ++$scope.lastTab;
-          $scope.tabs.push({id: $scope.lastTab});
-          $scope.setTab($scope.lastTab);
-        };
-
-        $scope.closeTab = function(tabId) {
-          if (tabId === $scope.currentTab) {
-            --$scope.currentTab;
-          }
-          $scope.tabs = _.without($scope.tabs, _.findWhere($scope.tabs, {id: tabId}));
-        };
+        if (config.isChromeApp) {
+          window.webkitRequestFileSystem(window.PERSISTEN, 1024, onInitFs, function(err) {if(err) {console.log(err)}});//request storage
+        }
 
         if (config.isElectronApp) {
           console.log('is electron app');
@@ -107,6 +55,49 @@ module.exports = function (app) {
           });
         }
 
+        $scope.lastTab = -1;
+        $scope.tabs = [];
+
+        $scope.loadingError = false;
+        $scope.tools = {};
+        $scope.validTools = [];
+
+        $scope.favorites = {};
+        $scope.selectedGraph = null;
+
+        $scope.setTab = function(tabId) {
+          $scope.currentTab = tabId;
+          $scope.selectedGraph = _.findWhere($scope.tabs, {id: tabId}).graphName;
+        };
+
+        $scope.openGraph = function(graphName) {
+          if ($scope.tabs.length === 0) {
+            $scope.newTab();
+          }
+          setTimeout(function(){
+            var graph = $scope.graphs[graphName];
+            var tabIndex = $scope.tabs.map(function(el) {
+              return el.id;
+            }).indexOf($scope.currentTab);
+            $scope.tabs[tabIndex].graphName = graph.name;
+            $scope.selectedGraph = graph.name;
+            renderGraph(graph);
+          }, 10);
+        };
+
+        $scope.newTab = function() {
+          ++$scope.lastTab;
+          $scope.tabs.push({id: $scope.lastTab});
+          $scope.setTab($scope.lastTab);
+        };
+
+        $scope.closeTab = function(tabId) {
+          if (tabId === $scope.currentTab) {
+            --$scope.currentTab;
+          }
+          $scope.tabs = _.without($scope.tabs, _.findWhere($scope.tabs, {id: tabId}));
+        };
+
         $scope.addToFavorites = function(graphName) {
           $scope.favorites[graphName] = $scope.graphs[graphName];
           bookmarks.add($scope.graphs[graphName]);
@@ -127,49 +118,73 @@ module.exports = function (app) {
         }
 
         //compose test data for graphs
-        function getAvailableGraphsList() {
+        function getAvailableGraphsList(cb) {
           var graphsHash = {};
           var dataPath;
           var geoPath;
+
           if (config.isElectronApp) {
             var path = require('path');
             dataPath = path.join(config.electronPath, 'client/src/public/data/data.csv');
             geoPath = path.join(config.electronPath, 'client/src/public/data/geo.json');
           } else if (config.isChromeApp) {
-            dataPath = chrome.runtime.getURL('data/data.csv');
+            dataPath = chrome.runtime.getURL('data/graphs/');
             geoPath = chrome.runtime.getURL('data/geo.json');
           }
-          for (var i=1; i<=10; i++) {
-            graphsHash['test-graph-' + i] = {
-              name: 'test-graph-' + i,
-              tool: 'BubbleChart',
-              opts: {
-                data: {
-                  path:dataPath,
-                  geoPath: geoPath,
-                  reader: 'safe-csv'
-                },
-                ui: {
-                  "buttons":[
-                    "find",
-                    "axes",
-                    "size",
-                    "colors",
-                    "trails",
-                    "lock",
-                    "moreoptions",
-                    "fullscreen"
-                  ],
-                  "buttons_expand":[
-                    "colors",
-                    "find",
-                    "size"
-                  ]
+
+          readerService.getGraphsList(function(err, graphsList) {
+            _.each(graphsList, function(graph) {
+              graphsHash[graph.name] = {
+                name: graph.name,
+                tool: 'BubbleChart',
+                opts: {
+                  data: {
+                    path:dataPath + graph.name,
+                    geoPath: geoPath,
+                    reader: 'safe-csv',
+                    splash: true
+                  },
+                  ui: {
+                    "buttons":[
+                      "find",
+                      "axes",
+                      "size",
+                      "colors",
+                      "trails",
+                      "lock",
+                      "moreoptions",
+                      "fullscreen"
+                    ],
+                    "buttons_expand":[
+                      "colors",
+                      "find",
+                      "size"
+                    ]
+                  }
                 }
-              }
-            };
-          }
-          return graphsHash;
+              };
+            });
+            cb(null,graphsHash);
+          });
+        }
+
+        function onInitFs(fs) {
+          config.fileSystem = fs;
+
+          getAvailableGraphsList(function(err, graphs){
+            $scope.graphs = graphs;
+          });
+          readBookmarks();
+        }
+
+        function readBookmarks() {
+          bookmarks.getAll(function(err, bookmarks) {
+            if(err) {
+              return console.log('get bookmarks error', err);
+            }
+            $scope.favorites = bookmarks;
+            $scope.safeApply();
+          });
         }
       }]);
 };

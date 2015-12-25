@@ -56,7 +56,6 @@ Vizabi.Reader.extend('safe-csv', {
             getGeoData(_this._geoPath, function(err, geoData) {
               var graphData = parseCsv(xhr.response);
               graphData = mergeGeoIntoGraphData(geoData, graphData);
-
               var res = format([graphData]);
               //cache and resolve
               FILE_CACHED$2[path] = res;
@@ -116,12 +115,16 @@ Vizabi.Reader.extend('safe-csv', {
 
         for (var i = 0; i < graphData.length; i++) {
           graphData[i].time = graphData[i].time + '';
+          if (typeof geoHash[graphData[i].geo] === 'undefined') {
+            //todo: log it
+            continue;
+          }
           graphData[i]['geo.name'] = geoHash[graphData[i].geo]['geo.name'];
           graphData[i]['geo.cat'] = geoHash[graphData[i].geo]['geo.cat'];
           graphData[i]['geo.region'] = geoHash[graphData[i].geo]['geo.region'];
-          //todo: fix csv parser
-          graphData[i]['u5mr'] = graphData[i]["u5mr\r"];
-          delete graphData[i]["u5mr\r"];
+          graphData[i]['geo.lat'] = geoHash[graphData[i].geo]['geo.lat'];
+          graphData[i]['geo.lng'] = geoHash[graphData[i].geo]['geo.lng'];
+          //todo: fix csv parser if delimiter present in string value
         }
 
         return graphData;
@@ -175,6 +178,9 @@ Vizabi.Reader.extend('safe-csv', {
         var headers=lines[0].split(",");
 
         for(var i=1;i<lines.length;i++){
+          if (!lines[i]) {
+            continue;
+          }
           var obj = {};
           var currentline=lines[i].split(",");
           for(var j=0;j<headers.length;j++){
@@ -183,7 +189,44 @@ Vizabi.Reader.extend('safe-csv', {
           result.push(obj);
         }
 
-        return result; //JavaScript object
+        //return result;
+        return parseCsvTest(csv); //JavaScript object
+      }
+
+      function parseCsvTest(csvString) {
+        // The array we're going to build
+        var csvArray   = [];
+        // Break it into rows to start
+        var csvRows    = csvString.split(/\n/);
+        // Take off the first line to get the headers, then split that into an array
+        var csvHeaders = csvRows.shift().split(',');
+
+        if (csvRows[csvRows.length -1] === '') {
+          csvRows.pop();
+        }
+        // Loop through remaining rows
+        for(var rowIndex = 0; rowIndex < csvRows.length; ++rowIndex){
+          var rowArray  = csvRows[rowIndex].split(',');
+
+          // Create a new row object to store our data.
+          var rowObject = csvArray[rowIndex] = {};
+
+          // Then iterate through the remaining properties and use the headers as keys
+          for(var propIndex = 0; propIndex < rowArray.length; ++propIndex){
+            // Grab the value from the row array we're looping through...
+            var propValue =   rowArray[propIndex].replace(/^"|"$/g,'');
+            // ...also grab the relevant header (the RegExp in both of these removes quotes)
+            var propLabel = csvHeaders[propIndex].replace(/^"|"$/g,'');
+
+            //if (propValue && !(propLabel in stringProperties) && typeof propValue !== 'number') {
+            //  propValue = +propValue;
+            //}
+
+            rowObject[propLabel] = propValue;
+          }
+        }
+
+        return csvArray;
       }
 
     });

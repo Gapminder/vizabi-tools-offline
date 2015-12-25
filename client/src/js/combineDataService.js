@@ -20,9 +20,6 @@ module.exports = function (app) {
               graphData[i]['geo.name'] = geoHash[graphData[i].geo]['geo.name'];
               graphData[i]['geo.cat'] = geoHash[graphData[i].geo]['geo.cat'];
               graphData[i]['geo.region'] = geoHash[graphData[i].geo]['geo.region'];
-
-              graphData[i]['u5mr'] = graphData[i]["u5mr\r"];
-              delete graphData[i]["u5mr\r"];
             }
             cb(err, graphData);
           });

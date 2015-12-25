@@ -1,992 +1,2202 @@
 [
   {
+    "geo":"abkh",
+    "geo.name":"Abkhazia",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"abw",
+    "geo.name":"Aruba",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":12.5,
+    "geo.lng":-69.96667
+  },
+  {
     "geo":"afg",
     "geo.name":"Afghanistan",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":33,
+    "geo.lng":66
   },
   {
     "geo":"ago",
     "geo.name":"Angola",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-12.5,
+    "geo.lng":18.5
+  },
+  {
+    "geo":"aia",
+    "geo.name":"Anguilla",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":18.21667,
+    "geo.lng":-63.05
+  },
+  {
+    "geo":"akr_a_dhe",
+    "geo.name":"Akrotiri and Dhekelia",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"ala",
+    "geo.name":"�land",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":60.25,
+    "geo.lng":20
   },
   {
     "geo":"alb",
     "geo.name":"Albania",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":41,
+    "geo.lng":20
+  },
+  {
+    "geo":"and",
+    "geo.name":"Andorra",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":42.50779,
+    "geo.lng":1.52109
+  },
+  {
+    "geo":"ant",
+    "geo.name":"Netherlands Antilles",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"are",
     "geo.name":"United Arab Emirates",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":23.75,
+    "geo.lng":54.5
   },
   {
     "geo":"arg",
     "geo.name":"Argentina",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":-34,
+    "geo.lng":-64
   },
   {
     "geo":"arm",
     "geo.name":"Armenia",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":40.25,
+    "geo.lng":45
+  },
+  {
+    "geo":"asm",
+    "geo.name":"American Samoa",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-11.056,
+    "geo.lng":-171.082
+  },
+  {
+    "geo":"ata",
+    "geo.name":"Antarctica",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":-90,
+    "geo.lng":0
+  },
+  {
+    "geo":"atg",
+    "geo.name":"Antigua and Barbuda",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":17.05,
+    "geo.lng":-61.8
   },
   {
     "geo":"aus",
     "geo.name":"Australia",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":-25,
+    "geo.lng":135
   },
   {
     "geo":"aut",
     "geo.name":"Austria",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":47.33333,
+    "geo.lng":13.33333
   },
   {
     "geo":"aze",
     "geo.name":"Azerbaijan",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":40.5,
+    "geo.lng":47.5
   },
   {
     "geo":"bdi",
     "geo.name":"Burundi",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-3.5,
+    "geo.lng":30
   },
   {
     "geo":"bel",
     "geo.name":"Belgium",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":50.75,
+    "geo.lng":4.5
   },
   {
     "geo":"ben",
     "geo.name":"Benin",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":9.5,
+    "geo.lng":2.25
   },
   {
     "geo":"bfa",
     "geo.name":"Burkina Faso",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":12.5,
+    "geo.lng":-1.66667
   },
   {
     "geo":"bgd",
     "geo.name":"Bangladesh",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":24,
+    "geo.lng":90
   },
   {
     "geo":"bgr",
     "geo.name":"Bulgaria",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":42.66667,
+    "geo.lng":25.25
   },
   {
     "geo":"bhr",
     "geo.name":"Bahrain",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":26.03333,
+    "geo.lng":50.55
+  },
+  {
+    "geo":"bhs",
+    "geo.name":"Bahamas",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":25.04082,
+    "geo.lng":-77.37122
   },
   {
     "geo":"bih",
     "geo.name":"Bosnia and Herzegovina",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":44.25,
+    "geo.lng":17.83333
   },
   {
     "geo":"blr",
     "geo.name":"Belarus",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":53,
+    "geo.lng":28
+  },
+  {
+    "geo":"blz",
+    "geo.name":"Belize",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":17.49952,
+    "geo.lng":-88.19756
+  },
+  {
+    "geo":"bmu",
+    "geo.name":"Bermuda",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":32.2949,
+    "geo.lng":-64.78303
   },
   {
     "geo":"bol",
     "geo.name":"Bolivia",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":-17,
+    "geo.lng":-65
+  },
+  {
+    "geo":"bouisl",
+    "geo.name":"Bouvet Island",
+    "geo.cat":"country",
+    "geo.region":"afr",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"bra",
     "geo.name":"Brazil",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":-10,
+    "geo.lng":-55
+  },
+  {
+    "geo":"brb",
+    "geo.name":"Barbados",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":13.16667,
+    "geo.lng":-59.53333
+  },
+  {
+    "geo":"brn",
+    "geo.name":"Brunei",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":4.5,
+    "geo.lng":114.66667
   },
   {
     "geo":"btn",
     "geo.name":"Bhutan",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":27.5,
+    "geo.lng":90.5
   },
   {
     "geo":"bwa",
     "geo.name":"Botswana",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-22,
+    "geo.lng":24
   },
   {
     "geo":"caf",
     "geo.name":"Central African Republic",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":7,
+    "geo.lng":21
   },
   {
     "geo":"can",
     "geo.name":"Canada",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":60.10867,
+    "geo.lng":-113.64258
+  },
+  {
+    "geo":"cck",
+    "geo.name":"Cocos Island",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-12.1642,
+    "geo.lng":96.87332
+  },
+  {
+    "geo":"chanisl",
+    "geo.name":"Channel Islands",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"che",
     "geo.name":"Switzerland",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":47.00016,
+    "geo.lng":8.01427
+  },
+  {
+    "geo":"cheslo",
+    "geo.name":"Czechoslovakia",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"chl",
     "geo.name":"Chile",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":-33.45694,
+    "geo.lng":-70.64827
   },
   {
     "geo":"chn",
     "geo.name":"China",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":35,
+    "geo.lng":105
   },
   {
     "geo":"civ",
     "geo.name":"Cote d'Ivoire",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":8,
+    "geo.lng":-5.5
   },
   {
     "geo":"cmr",
     "geo.name":"Cameroon",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":6,
+    "geo.lng":12.5
   },
   {
     "geo":"cod",
     "geo.name":"Congo, Dem. Rep.",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-2.5,
+    "geo.lng":23.5
   },
   {
     "geo":"cog",
     "geo.name":"Congo, Rep.",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-1,
+    "geo.lng":15.5
+  },
+  {
+    "geo":"cok",
+    "geo.name":"Cook Is",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-21.24842,
+    "geo.lng":-159.78516
   },
   {
     "geo":"col",
     "geo.name":"Colombia",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":4,
+    "geo.lng":-73.25
   },
   {
     "geo":"com",
     "geo.name":"Comoros",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-12.23333,
+    "geo.lng":44.44553
   },
   {
     "geo":"cpv",
     "geo.name":"Cape Verde",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":16,
+    "geo.lng":-24
   },
   {
     "geo":"cri",
     "geo.name":"Costa Rica",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":10,
+    "geo.lng":-84
   },
   {
     "geo":"cub",
     "geo.name":"Cuba",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":22,
+    "geo.lng":-79.5
+  },
+  {
+    "geo":"cxr",
+    "geo.name":"Christmas Island",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-10.5,
+    "geo.lng":105.66667
+  },
+  {
+    "geo":"cym",
+    "geo.name":"Cayman Islands",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":19.5,
+    "geo.lng":-80.66667
   },
   {
     "geo":"cyp",
     "geo.name":"Cyprus",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":35,
+    "geo.lng":33
+  },
+  {
+    "geo":"cyp_nor",
+    "geo.name":"Northern Cyprus",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"cze",
     "geo.name":"Czech Republic",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":49.75,
+    "geo.lng":15
   },
   {
     "geo":"deu",
     "geo.name":"Germany",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":51.5,
+    "geo.lng":10.5
+  },
+  {
+    "geo":"deu_east",
+    "geo.name":"East Germany",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"deu_west",
+    "geo.name":"West Germany",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"dji",
     "geo.name":"Djibouti",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":11.58901,
+    "geo.lng":43.14503
+  },
+  {
+    "geo":"dma",
+    "geo.name":"Dominica",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":15.5,
+    "geo.lng":-61.33333
   },
   {
     "geo":"dnk",
     "geo.name":"Denmark",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":56,
+    "geo.lng":10
   },
   {
     "geo":"dom",
     "geo.name":"Dominican Republic",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":19,
+    "geo.lng":-70.66667
   },
   {
     "geo":"dza",
     "geo.name":"Algeria",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":28,
+    "geo.lng":3
   },
   {
     "geo":"ecu",
     "geo.name":"Ecuador",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":-1.25,
+    "geo.lng":-78.25
   },
   {
     "geo":"egy",
     "geo.name":"Egypt",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":27,
+    "geo.lng":30
   },
   {
     "geo":"eri",
     "geo.name":"Eritrea",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":15,
+    "geo.lng":39
+  },
+  {
+    "geo":"eri_a_eth",
+    "geo.name":"Eritrea and Ethiopia",
+    "geo.cat":"country",
+    "geo.region":"afr",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"esh",
+    "geo.name":"Western Sahara",
+    "geo.cat":"country",
+    "geo.region":"afr",
+    "geo.lat":24.49215,
+    "geo.lng":-12.65625
   },
   {
     "geo":"esp",
     "geo.name":"Spain",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":40,
+    "geo.lng":-4
   },
   {
     "geo":"est",
     "geo.name":"Estonia",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":59,
+    "geo.lng":26
   },
   {
     "geo":"eth",
     "geo.name":"Ethiopia",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":9,
+    "geo.lng":39.5
   },
   {
     "geo":"fin",
     "geo.name":"Finland",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":64,
+    "geo.lng":26
   },
   {
     "geo":"fji",
     "geo.name":"Fiji",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":-18,
+    "geo.lng":178
+  },
+  {
+    "geo":"flk",
+    "geo.name":"Falkland Is (Malvinas)",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":-51.75,
+    "geo.lng":-59.16667
   },
   {
     "geo":"fra",
     "geo.name":"France",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":46,
+    "geo.lng":2
+  },
+  {
+    "geo":"fra_antarc",
+    "geo.name":"French Southern and Antarctic Lands",
+    "geo.cat":"country",
+    "geo.region":"fra_antarc",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"fra_clipperton",
+    "geo.name":"Clipperton",
+    "geo.cat":"country",
+    "geo.region":"fra_clipperton",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"fro",
+    "geo.name":"Faeroe Islands",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":62,
+    "geo.lng":-7
+  },
+  {
+    "geo":"fsm",
+    "geo.name":"Micronesia, Fed. Sts.",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":6.924,
+    "geo.lng":158.162
   },
   {
     "geo":"gab",
     "geo.name":"Gabon",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-1,
+    "geo.lng":11.75
+  },
+  {
+    "geo":"gbg",
+    "geo.name":"Guernsey",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":49.45474,
+    "geo.lng":-2.57629
+  },
+  {
+    "geo":"gbm",
+    "geo.name":"Isle of Man",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":54.15,
+    "geo.lng":-4.48333
   },
   {
     "geo":"gbr",
     "geo.name":"United Kingdom",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":54.75844,
+    "geo.lng":-2.69531
   },
   {
     "geo":"geo",
     "geo.name":"Georgia",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":41.99998,
+    "geo.lng":43.4999
   },
   {
     "geo":"gha",
     "geo.name":"Ghana",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":8.1,
+    "geo.lng":-1.2
+  },
+  {
+    "geo":"gib",
+    "geo.name":"Gibraltar",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":36.14474,
+    "geo.lng":-5.35257
   },
   {
     "geo":"gin",
     "geo.name":"Guinea",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":10.83333,
+    "geo.lng":-10.66667
+  },
+  {
+    "geo":"glp",
+    "geo.name":"Guadeloupe",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":16.25,
+    "geo.lng":-61.58333
   },
   {
     "geo":"gmb",
     "geo.name":"Gambia",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":13.5,
+    "geo.lng":-15.5
   },
   {
     "geo":"gnb",
     "geo.name":"Guinea-Bissau",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":12,
+    "geo.lng":-15
   },
   {
     "geo":"gnq",
     "geo.name":"Equatorial Guinea",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":1.7,
+    "geo.lng":10.5
   },
   {
     "geo":"grc",
     "geo.name":"Greece",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":39,
+    "geo.lng":22
+  },
+  {
+    "geo":"grd",
+    "geo.name":"Grenada",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":12.11667,
+    "geo.lng":-61.66667
+  },
+  {
+    "geo":"grl",
+    "geo.name":"Greenland",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":72,
+    "geo.lng":-40
   },
   {
     "geo":"gtm",
     "geo.name":"Guatemala",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":14.64072,
+    "geo.lng":-90.51327
+  },
+  {
+    "geo":"guf",
+    "geo.name":"French Guiana",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":4,
+    "geo.lng":-53
+  },
+  {
+    "geo":"gum",
+    "geo.name":"Guam",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":13.47861,
+    "geo.lng":144.81834
   },
   {
     "geo":"guy",
     "geo.name":"Guyana",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":5,
+    "geo.lng":-59
+  },
+  {
+    "geo":"heard_a_mcd",
+    "geo.name":"Heard and McDonald Islands",
+    "geo.cat":"country",
+    "geo.region":"heard_a_mcd",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"hkg",
+    "geo.name":"Hong Kong, China",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":22.28552,
+    "geo.lng":114.15769
   },
   {
     "geo":"hnd",
     "geo.name":"Honduras",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":15,
+    "geo.lng":-86.5
+  },
+  {
+    "geo":"hos",
+    "geo.name":"Holy See",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":41.90236,
+    "geo.lng":12.45332
+  },
+  {
+    "geo":"hrv",
+    "geo.name":"Croatia",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":45.16667,
+    "geo.lng":15.5
   },
   {
     "geo":"hti",
     "geo.name":"Haiti",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":19,
+    "geo.lng":-72.41667
   },
   {
     "geo":"hun",
     "geo.name":"Hungary",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":47,
+    "geo.lng":20
   },
   {
     "geo":"idn",
     "geo.name":"Indonesia",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":-5,
+    "geo.lng":120
   },
   {
     "geo":"ind",
     "geo.name":"India",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":22,
+    "geo.lng":79
+  },
+  {
+    "geo":"iot",
+    "geo.name":"British Indian Ocean Territory",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-6,
+    "geo.lng":72
   },
   {
     "geo":"irl",
     "geo.name":"Ireland",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":53,
+    "geo.lng":-8
   },
   {
     "geo":"irn",
     "geo.name":"Iran",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":32,
+    "geo.lng":53
   },
   {
     "geo":"irq",
     "geo.name":"Iraq",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":33,
+    "geo.lng":44
+  },
+  {
+    "geo":"isl",
+    "geo.name":"Iceland",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":65,
+    "geo.lng":-18
   },
   {
     "geo":"isr",
     "geo.name":"Israel",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":31.5,
+    "geo.lng":34.75
   },
   {
     "geo":"ita",
     "geo.name":"Italy",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":42.83333,
+    "geo.lng":12.83333
   },
   {
     "geo":"jam",
     "geo.name":"Jamaica",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":18.16667,
+    "geo.lng":-77.25
+  },
+  {
+    "geo":"jey",
+    "geo.name":"Jersey",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":49.21667,
+    "geo.lng":-2.11667
   },
   {
     "geo":"jor",
     "geo.name":"Jordan",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":31,
+    "geo.lng":36
   },
   {
     "geo":"jpn",
     "geo.name":"Japan",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":35.68536,
+    "geo.lng":139.75309
   },
   {
     "geo":"kaz",
     "geo.name":"Kazakhstan",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":48,
+    "geo.lng":68
   },
   {
     "geo":"ken",
     "geo.name":"Kenya",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":1,
+    "geo.lng":38
   },
   {
     "geo":"kgz",
     "geo.name":"Kyrgyz Republic",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":41.5,
+    "geo.lng":75
   },
   {
     "geo":"khm",
     "geo.name":"Cambodia",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":13,
+    "geo.lng":105
+  },
+  {
+    "geo":"kir",
+    "geo.name":"Kiribati",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":1.421,
+    "geo.lng":172.984
+  },
+  {
+    "geo":"kna",
+    "geo.name":"St. Kitts and Nevis",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":17.33333,
+    "geo.lng":-62.75
   },
   {
     "geo":"kor",
     "geo.name":"South Korea",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":36.5,
+    "geo.lng":127.75
+  },
+  {
+    "geo":"korea_union",
+    "geo.name":"United Korea (former)",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"kos",
+    "geo.name":"Kosovo",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"kwt",
     "geo.name":"Kuwait",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":29.36972,
+    "geo.lng":47.97833
   },
   {
     "geo":"lao",
     "geo.name":"Lao",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":18,
+    "geo.lng":105
   },
   {
     "geo":"lbn",
     "geo.name":"Lebanon",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":33.83333,
+    "geo.lng":35.83333
   },
   {
     "geo":"lbr",
     "geo.name":"Liberia",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":6.5,
+    "geo.lng":-9.5
   },
   {
     "geo":"lby",
     "geo.name":"Libya",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":28,
+    "geo.lng":17
+  },
+  {
+    "geo":"lca",
+    "geo.name":"St. Lucia",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":13.88333,
+    "geo.lng":-60.96667
+  },
+  {
+    "geo":"lie",
+    "geo.name":"Liechtenstein",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":47.16667,
+    "geo.lng":9.53333
   },
   {
     "geo":"lka",
     "geo.name":"Sri Lanka",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":7.75,
+    "geo.lng":80.75
   },
   {
     "geo":"lso",
     "geo.name":"Lesotho",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-29.5,
+    "geo.lng":28.25
   },
   {
     "geo":"ltu",
     "geo.name":"Lithuania",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":55.41667,
+    "geo.lng":24
   },
   {
     "geo":"lux",
     "geo.name":"Luxembourg",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":49.61167,
+    "geo.lng":6.13
   },
   {
     "geo":"lva",
     "geo.name":"Latvia",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":57,
+    "geo.lng":25
+  },
+  {
+    "geo":"mac",
+    "geo.name":"Macao, China",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":22.20056,
+    "geo.lng":113.54611
+  },
+  {
+    "geo":"maf",
+    "geo.name":"St. Martin (French part)",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"mar",
     "geo.name":"Morocco",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":32,
+    "geo.lng":-6
+  },
+  {
+    "geo":"mco",
+    "geo.name":"Monaco",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":43.73333,
+    "geo.lng":7.41667
   },
   {
     "geo":"mda",
     "geo.name":"Moldova",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":47.25,
+    "geo.lng":28.58333
   },
   {
     "geo":"mdg",
     "geo.name":"Madagascar",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-20,
+    "geo.lng":47
+  },
+  {
+    "geo":"mdv",
+    "geo.name":"Maldives",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":3.2,
+    "geo.lng":73
   },
   {
     "geo":"mex",
     "geo.name":"Mexico",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":19.42847,
+    "geo.lng":-99.12766
+  },
+  {
+    "geo":"mhl",
+    "geo.name":"Marshall Islands",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":7.113,
+    "geo.lng":171.236
   },
   {
     "geo":"mkd",
     "geo.name":"Macedonia, FYR",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":41.66667,
+    "geo.lng":21.75
   },
   {
     "geo":"mli",
     "geo.name":"Mali",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":18,
+    "geo.lng":-2
+  },
+  {
+    "geo":"mlt",
+    "geo.name":"Malta",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":35.91667,
+    "geo.lng":14.43333
   },
   {
     "geo":"mmr",
     "geo.name":"Myanmar",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":21,
+    "geo.lng":96
   },
   {
     "geo":"mne",
     "geo.name":"Montenegro",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":42.75,
+    "geo.lng":19.25
   },
   {
     "geo":"mng",
     "geo.name":"Mongolia",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":46,
+    "geo.lng":105
+  },
+  {
+    "geo":"mnp",
+    "geo.name":"Northern Mariana Islands",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":15.214,
+    "geo.lng":145.756
   },
   {
     "geo":"moz",
     "geo.name":"Mozambique",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-18.25,
+    "geo.lng":35
   },
   {
     "geo":"mrt",
     "geo.name":"Mauritania",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":20.25,
+    "geo.lng":-10.5
+  },
+  {
+    "geo":"msr",
+    "geo.name":"Montserrat",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":16.75,
+    "geo.lng":-62.2
+  },
+  {
+    "geo":"mtq",
+    "geo.name":"Martinique",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":14.66667,
+    "geo.lng":-61
   },
   {
     "geo":"mus",
     "geo.name":"Mauritius",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-20.3,
+    "geo.lng":57.58333
   },
   {
     "geo":"mwi",
     "geo.name":"Malawi",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-13.5,
+    "geo.lng":34
   },
   {
     "geo":"mys",
     "geo.name":"Malaysia",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":2.5,
+    "geo.lng":112.5
+  },
+  {
+    "geo":"myt",
+    "geo.name":"Mayotte",
+    "geo.cat":"country",
+    "geo.region":"afr",
+    "geo.lat":-12.83333,
+    "geo.lng":45.16667
   },
   {
     "geo":"nam",
     "geo.name":"Namibia",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-22,
+    "geo.lng":17
+  },
+  {
+    "geo":"ncl",
+    "geo.name":"New Caledonia",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-21.5,
+    "geo.lng":165.5
   },
   {
     "geo":"ner",
     "geo.name":"Niger",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":18,
+    "geo.lng":9
+  },
+  {
+    "geo":"nfk",
+    "geo.name":"Norfolk Island",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-29.03333,
+    "geo.lng":167.95
   },
   {
     "geo":"nga",
     "geo.name":"Nigeria",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":10,
+    "geo.lng":8
+  },
+  {
+    "geo":"ngokar",
+    "geo.name":"Ngorno-Karabakh",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"nic",
     "geo.name":"Nicaragua",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":13,
+    "geo.lng":-85
+  },
+  {
+    "geo":"niu",
+    "geo.name":"Niue",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-19.03333,
+    "geo.lng":-169.86667
   },
   {
     "geo":"nld",
     "geo.name":"Netherlands",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":52.25,
+    "geo.lng":5.75
+  },
+  {
+    "geo":"nld_curacao",
+    "geo.name":"Cura�ao",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":12.16667,
+    "geo.lng":-68.96667
   },
   {
     "geo":"nor",
     "geo.name":"Norway",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":62,
+    "geo.lng":10
+  },
+  {
+    "geo":"north_mar",
+    "geo.name":"Northern Marianas",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"npl",
     "geo.name":"Nepal",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":28,
+    "geo.lng":84
+  },
+  {
+    "geo":"nru",
+    "geo.name":"Nauru",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-0.517,
+    "geo.lng":166.933
   },
   {
     "geo":"nzl",
     "geo.name":"New Zealand",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":-42,
+    "geo.lng":174
   },
   {
     "geo":"omn",
     "geo.name":"Oman",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":21,
+    "geo.lng":57
   },
   {
     "geo":"pak",
     "geo.name":"Pakistan",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":30,
+    "geo.lng":70
   },
   {
     "geo":"pan",
     "geo.name":"Panama",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":8.9936,
+    "geo.lng":-79.51973
+  },
+  {
+    "geo":"pcn",
+    "geo.name":"Pitcairn",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-25.06667,
+    "geo.lng":-130.1
   },
   {
     "geo":"per",
     "geo.name":"Peru",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":-10,
+    "geo.lng":-75.25
   },
   {
     "geo":"phl",
     "geo.name":"Philippines",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":13,
+    "geo.lng":122
+  },
+  {
+    "geo":"plw",
+    "geo.name":"Palau",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":7.503,
+    "geo.lng":134.621
   },
   {
     "geo":"png",
     "geo.name":"Papua New Guinea",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":-6,
+    "geo.lng":147
   },
   {
     "geo":"pol",
     "geo.name":"Poland",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":52,
+    "geo.lng":20
+  },
+  {
+    "geo":"pri",
+    "geo.name":"Puerto Rico",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":18.46633,
+    "geo.lng":-66.10572
   },
   {
     "geo":"prk",
     "geo.name":"North Korea",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":40,
+    "geo.lng":127
   },
   {
     "geo":"prt",
     "geo.name":"Portugal",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":39.6945,
+    "geo.lng":-8.13057
   },
   {
     "geo":"pry",
     "geo.name":"Paraguay",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":-23.33333,
+    "geo.lng":-58
   },
   {
     "geo":"pse",
     "geo.name":"West Bank and Gaza",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":31.92157,
+    "geo.lng":35.20329
+  },
+  {
+    "geo":"pse_gaza",
+    "geo.name":"Gaza Strip",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"pse_west_bank",
+    "geo.name":"West Bank",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"pyf",
+    "geo.name":"French Polynesia",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-15,
+    "geo.lng":-140
   },
   {
     "geo":"qat",
     "geo.name":"Qatar",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":25.27932,
+    "geo.lng":51.52245
+  },
+  {
+    "geo":"reu",
+    "geo.name":"Reunion",
+    "geo.cat":"country",
+    "geo.region":"afr",
+    "geo.lat":-20.88231,
+    "geo.lng":55.4504
   },
   {
     "geo":"rou",
     "geo.name":"Romania",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":46,
+    "geo.lng":25
   },
   {
     "geo":"rus",
     "geo.name":"Russia",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":60,
+    "geo.lng":100
   },
   {
     "geo":"rwa",
     "geo.name":"Rwanda",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-2,
+    "geo.lng":30
   },
   {
     "geo":"sau",
     "geo.name":"Saudi Arabia",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":25,
+    "geo.lng":45
+  },
+  {
+    "geo":"scg",
+    "geo.name":"Serbia and Montenegro",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"scg_ex_kos",
+    "geo.name":"Serbia excluding Kosovo",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"sdn",
     "geo.name":"Sudan",
     "geo.cat":"country",
-    "geo.region":"afr"
-  },
-  {
-    "geo":"sds",
-    "geo.name":"South Sudan",
-    "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":16,
+    "geo.lng":30
   },
   {
     "geo":"sen",
     "geo.name":"Senegal",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":14.5,
+    "geo.lng":-14.25
+  },
+  {
+    "geo":"sgero_a_ssandw",
+    "geo.name":"South Georgia and the South Sandwich Islands",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"sgp",
     "geo.name":"Singapore",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":1.28967,
+    "geo.lng":103.85007
+  },
+  {
+    "geo":"shn",
+    "geo.name":"St. Helena",
+    "geo.cat":"country",
+    "geo.region":"afr",
+    "geo.lat":-15.95,
+    "geo.lng":-5.7
+  },
+  {
+    "geo":"sjm",
+    "geo.name":"Svalbard",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":78,
+    "geo.lng":20
   },
   {
     "geo":"slb",
     "geo.name":"Solomon Islands",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":-8,
+    "geo.lng":159
   },
   {
     "geo":"sle",
     "geo.name":"Sierra Leone",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":8.5,
+    "geo.lng":-11.5
   },
   {
     "geo":"slv",
     "geo.name":"El Salvador",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":13.83333,
+    "geo.lng":-88.91667
+  },
+  {
+    "geo":"smr",
+    "geo.name":"San Marino",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":43.93667,
+    "geo.lng":12.44639
   },
   {
     "geo":"som",
     "geo.name":"Somalia",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":6,
+    "geo.lng":48
+  },
+  {
+    "geo":"som_somland",
+    "geo.name":"Somaliland",
+    "geo.cat":"country",
+    "geo.region":"afr",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"sosset",
+    "geo.name":"South Ossetia",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"spm",
+    "geo.name":"St.-Pierre-et-Miquelon",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":46.83333,
+    "geo.lng":-56.33333
   },
   {
     "geo":"srb",
     "geo.name":"Serbia",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":44.81892,
+    "geo.lng":20.45998
+  },
+  {
+    "geo":"ssd",
+    "geo.name":"South Sudan",
+    "geo.cat":"country",
+    "geo.region":"afr",
+    "geo.lat":7.5,
+    "geo.lng":30
+  },
+  {
+    "geo":"stbar",
+    "geo.name":"St. Barth�lemy",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"stmar",
+    "geo.name":"St. Martin",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"stp",
+    "geo.name":"Sao Tome and Principe",
+    "geo.cat":"country",
+    "geo.region":"afr",
+    "geo.lat":1,
+    "geo.lng":7
   },
   {
     "geo":"sur",
     "geo.name":"Suriname",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":4,
+    "geo.lng":-56
   },
   {
     "geo":"svk",
     "geo.name":"Slovak Republic",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":48.66667,
+    "geo.lng":19.5
   },
   {
     "geo":"svn",
     "geo.name":"Slovenia",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":46.08333,
+    "geo.lng":15
   },
   {
     "geo":"swe",
     "geo.name":"Sweden",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":62,
+    "geo.lng":15
   },
   {
     "geo":"swz",
     "geo.name":"Swaziland",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-26.5,
+    "geo.lng":31.5
+  },
+  {
+    "geo":"sxm",
+    "geo.name":"Sint Maarten (Dutch part)",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":18.04167,
+    "geo.lng":-63.06667
+  },
+  {
+    "geo":"syc",
+    "geo.name":"Seychelles",
+    "geo.cat":"country",
+    "geo.region":"afr",
+    "geo.lat":-4.58333,
+    "geo.lng":55.66667
   },
   {
     "geo":"syr",
     "geo.name":"Syria",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":35,
+    "geo.lng":38
+  },
+  {
+    "geo":"tca",
+    "geo.name":"Turks and Caicos Islands",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":21.73333,
+    "geo.lng":-71.58333
   },
   {
     "geo":"tcd",
     "geo.name":"Chad",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":15,
+    "geo.lng":19
   },
   {
     "geo":"tgo",
     "geo.name":"Togo",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":8.66667,
+    "geo.lng":1.08333
   },
   {
     "geo":"tha",
     "geo.name":"Thailand",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":15.5,
+    "geo.lng":101
   },
   {
     "geo":"tjk",
     "geo.name":"Tajikistan",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":39,
+    "geo.lng":71
+  },
+  {
+    "geo":"tkl",
+    "geo.name":"Tokelau",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-9.167,
+    "geo.lng":-171.83
   },
   {
     "geo":"tkm",
     "geo.name":"Turkmenistan",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":39.75,
+    "geo.lng":59.66667
   },
   {
     "geo":"tls",
     "geo.name":"Timor-Leste",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":-8.83333,
+    "geo.lng":125.75
+  },
+  {
+    "geo":"ton",
+    "geo.name":"Tonga",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-20,
+    "geo.lng":-175
+  },
+  {
+    "geo":"transn",
+    "geo.name":"Transnistria",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"tto",
     "geo.name":"Trinidad and Tobago",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":11,
+    "geo.lng":-61
   },
   {
     "geo":"tun",
     "geo.name":"Tunisia",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":34,
+    "geo.lng":9
   },
   {
     "geo":"tur",
     "geo.name":"Turkey",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":39,
+    "geo.lng":35
+  },
+  {
+    "geo":"tuv",
+    "geo.name":"Tuvalu",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-8.51719,
+    "geo.lng":179.14478
+  },
+  {
+    "geo":"twn",
+    "geo.name":"Taiwan",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":24,
+    "geo.lng":121
   },
   {
     "geo":"tza",
     "geo.name":"Tanzania",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-6,
+    "geo.lng":35
   },
   {
     "geo":"uga",
     "geo.name":"Uganda",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":1.25,
+    "geo.lng":32.5
   },
   {
     "geo":"ukr",
     "geo.name":"Ukraine",
     "geo.cat":"country",
-    "geo.region":"eur"
+    "geo.region":"eur",
+    "geo.lat":49,
+    "geo.lng":32
   },
   {
     "geo":"ury",
     "geo.name":"Uruguay",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":-33,
+    "geo.lng":-56
   },
   {
     "geo":"usa",
     "geo.name":"United States",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":39.76,
+    "geo.lng":-98.5
+  },
+  {
+    "geo":"usa_minor_out_isl",
+    "geo.name":"US Minor Outlying Islands",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"ussr",
+    "geo.name":"USSR",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"uzb",
     "geo.name":"Uzbekistan",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":41.66667,
+    "geo.lng":63.83333
+  },
+  {
+    "geo":"vct",
+    "geo.name":"St. Vincent and the Grenadines",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":13.08333,
+    "geo.lng":-61.2
   },
   {
     "geo":"ven",
     "geo.name":"Venezuela",
     "geo.cat":"country",
-    "geo.region":"ame"
+    "geo.region":"ame",
+    "geo.lat":8,
+    "geo.lng":-66
+  },
+  {
+    "geo":"vgb",
+    "geo.name":"British Virgin Islands",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":18.5,
+    "geo.lng":-64.5
+  },
+  {
+    "geo":"vir",
+    "geo.name":"Virgin Islands (U.S.)",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":18.34829,
+    "geo.lng":-64.98348
+  },
+  {
+    "geo":"virg_isl",
+    "geo.name":"Virgin Islands",
+    "geo.cat":"country",
+    "geo.region":"ame",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"vnm",
     "geo.name":"Vietnam",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":16.16667,
+    "geo.lng":107.83333
+  },
+  {
+    "geo":"vut",
+    "geo.name":"Vanuatu",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-16,
+    "geo.lng":167
+  },
+  {
+    "geo":"wlf",
+    "geo.name":"Wallis et Futuna",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-13.3,
+    "geo.lng":-176.2
+  },
+  {
+    "geo":"wsm",
+    "geo.name":"Samoa",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":-13.8,
+    "geo.lng":-172.13333
   },
   {
     "geo":"yem",
     "geo.name":"Yemen",
     "geo.cat":"country",
-    "geo.region":"asi"
+    "geo.region":"asi",
+    "geo.lat":15.5,
+    "geo.lng":47.5
+  },
+  {
+    "geo":"yem_north",
+    "geo.name":"North Yemen (former)",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"yem_south",
+    "geo.name":"South Yemen (former)",
+    "geo.cat":"country",
+    "geo.region":"asi",
+    "geo.lat":null,
+    "geo.lng":null
+  },
+  {
+    "geo":"yug",
+    "geo.name":"Yugoslavia",
+    "geo.cat":"country",
+    "geo.region":"eur",
+    "geo.lat":null,
+    "geo.lng":null
   },
   {
     "geo":"zaf",
     "geo.name":"South Africa",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-29,
+    "geo.lng":24
   },
   {
     "geo":"zmb",
     "geo.name":"Zambia",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-14.33333,
+    "geo.lng":28.5
   },
   {
     "geo":"zwe",
     "geo.name":"Zimbabwe",
     "geo.cat":"country",
-    "geo.region":"afr"
+    "geo.region":"afr",
+    "geo.lat":-19,
+    "geo.lng":29.75
   }
 ]
