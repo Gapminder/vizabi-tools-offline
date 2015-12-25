@@ -173,6 +173,7 @@ module.exports = function (app) {
 
           getAvailableGraphsList(function(err, graphs){
             $scope.graphs = graphs;
+            $scope.safeApply();
           });
           readBookmarks();
         }
