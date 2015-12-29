@@ -5,14 +5,20 @@ module.exports = function (app) {
   app
     .controller('gapminderToolsCtrl', [
       '$scope', '$route', '$routeParams', '$location',
-      'vizabiFactory', '$window', 'config', 'readerService', 'BookmarksService',
+      'vizabiFactory', '$window', 'config', 'readerService', 'BookmarksService', '$timeout',
       function ($scope, $route, $routeParams, $location,  vizabiFactory,
-                $window, config, readerService, BookmarksService) {
+                $window, config, readerService, BookmarksService, $timeout) {
         var placeholder = document.getElementById('vizabi-placeholder1');
         var bookmarks = new BookmarksService(readerService);
 
         if (config.isChromeApp) {
-          window.webkitRequestFileSystem(window.PERSISTEN, 1024, onInitFs, function(err) {if(err) {console.log(err)}});//request storage
+          //request storage in chrome file system
+          //@see: http://www.html5rocks.com/en/tutorials/file/filesystem/
+          window.webkitRequestFileSystem(window.PERSISTEN, 1024, onInitFs, function(err) {
+            if(err) {
+              console.log(err)
+            }
+          });
         }
 
         if (config.isElectronApp) {
@@ -48,6 +54,7 @@ module.exports = function (app) {
                 }
                 Vizabi._globals.metadata = JSON.parse(results[0]);
                 vizabiContext.model.language.strings.set(vizabiContext.model.language.id, JSON.parse(results[1]));
+                //set indicators
                 Vizabi._globals.metadata.indicatorsArray = ["gini", "gdp_per_cap", "u5mr"];
                 promise.resolve();
               });
@@ -55,26 +62,33 @@ module.exports = function (app) {
           });
         }
 
+        //last tab created
         $scope.lastTab = -1;
         $scope.tabs = [];
 
         $scope.loadingError = false;
+        //@todo: remove it
         $scope.tools = {};
+        //@todo: remove it
         $scope.validTools = [];
 
+        //favorites graphs
         $scope.favorites = {};
         $scope.selectedGraph = null;
 
         $scope.setTab = function(tabId) {
+          //set current tab id and get current graph object
           $scope.currentTab = tabId;
           $scope.selectedGraph = _.findWhere($scope.tabs, {id: tabId}).graphName;
         };
 
         $scope.openGraph = function(graphName) {
           if ($scope.tabs.length === 0) {
+            //if there are no tabs - create one
             $scope.newTab();
           }
-          setTimeout(function(){
+          //render graph when tab is rendered
+          $timeout(function(){
             var graph = $scope.graphs[graphName];
             var tabIndex = $scope.tabs.map(function(el) {
               return el.id;
@@ -82,10 +96,11 @@ module.exports = function (app) {
             $scope.tabs[tabIndex].graphName = graph.name;
             $scope.selectedGraph = graph.name;
             renderGraph(graph);
-          }, 10);
+          }, 0);
         };
 
         $scope.newTab = function() {
+          //create new tab and set current tab
           ++$scope.lastTab;
           $scope.tabs.push({id: $scope.lastTab});
           $scope.setTab($scope.lastTab);
@@ -123,6 +138,7 @@ module.exports = function (app) {
           var dataPath;
           var geoPath;
 
+          //@todo: set paths to config
           if (config.isElectronApp) {
             var path = require('path');
             dataPath = path.join(config.electronPath, 'client/src/public/data/data.csv');
