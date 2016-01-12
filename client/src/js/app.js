@@ -7,6 +7,7 @@ var ngTouch = require('angular-touch');
 // Vizabi stuff
 
 require('./vizabi-ws-reader');
+require('./vizabi-ddf-csv-reader');
 var app = angular.module('gapminderTools', [ngRoute, ngTouch], ['$provide', function($provide) {
   //@see: https://github.com/angular/angular.js/issues/11932
 
