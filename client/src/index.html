@@ -18,12 +18,25 @@
       GAPMINDER TOOLS
     </a>
     <button ng-click="newTab()">new tab</button>
-    <select ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
+
+    <label><input type="radio" ng-model="mode" value="default">default</label>
+    <label><input type="radio" ng-model="mode" value="ddf">ddf</label>&nbsp;&nbsp;
+
+    <select ng-if="mode==='default'" ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
       <option value="">choose graph</option>
       <option ng-repeat="graph in graphs">{{graph.name}}</option>
     </select>
+
+    <select ng-if="mode==='ddf'" ng-model="ddf.type">
+      <option value="">choose graph type</option>
+      <option ng-repeat="type in ddf.types" value="{{type.value}}">{{type.name}}</option>
+    </select>
+
+    <label ng-if="mode==='ddf'">DDF data URL<input type="text" ng-model="ddf.url"></label>
+    <input type="button" ng-if="mode==='ddf'" ng-click="openDdf()" value="Go" />
+
     <span>List of favorites:</span>
-    <select ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
+    <select ng-if="mode==='default'" ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
       <option value="">choose graph</option>
       <option ng-repeat="graph in favorites">{{graph.name}}</option>
     </select>

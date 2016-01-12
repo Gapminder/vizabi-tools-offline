@@ -66,6 +66,16 @@ module.exports = function (app) {
         $scope.lastTab = -1;
         $scope.tabs = [];
 
+        $scope.mode = 'default';
+        $scope.ddf = {
+          url: 'https://raw.githubusercontent.com/buchslava/ddf--gapminder--systema_globalis/master',
+          type: 'BubbleChart',
+          types: [
+            {value: 'BubbleChart', name: 'Bubble Chart'},
+            {value: 'MountainChart', name: 'Mountain Chart'}
+          ]
+        };
+
         $scope.loadingError = false;
         //@todo: remove it
         $scope.tools = {};
@@ -99,6 +109,19 @@ module.exports = function (app) {
           }, 0);
         };
 
+        $scope.openDdf = function() {
+          if ($scope.tabs.length === 0) {
+            //if there are no tabs - create one
+            $scope.newTab();
+          }
+          //render graph when tab is rendered
+          $timeout(function() {
+
+            console.log($scope.ddf.url, $scope.ddf.type);
+
+          }, 0);
+        };
+
         $scope.newTab = function() {
           //create new tab and set current tab
           ++$scope.lastTab;
@@ -129,6 +152,7 @@ module.exports = function (app) {
 
         function renderGraph(graph) {
           var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
+          //console.log(graph.tool, placeholder, graph.opts);
           vizabiFactory.render(graph.tool, placeholder, graph.opts);
         }
 
