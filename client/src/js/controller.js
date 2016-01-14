@@ -125,8 +125,12 @@ module.exports = function (app) {
                 splash: false
               },
               ui: {
-                buttons: ["find", "axes", "size", "colors", "trails", "lock", "moreoptions", "fullscreen"],
-                buttons_expand: ["colors", "find", "size"]
+                buttons: ['colors', 'find', 'trails', 'lock', 'size', 'moreoptions', 'fullscreen'],
+                dialogs: {
+                  'popup': ['colors', 'find', 'size', 'moreoptions'],
+                  'sidebar': ['colors', 'find', 'size'],
+                  'moreoptions': ['opacity', 'speed', 'axes', 'size', 'colors', 'presentation']
+                }
               },
               state: {
                 time: {
