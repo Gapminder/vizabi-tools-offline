@@ -109,16 +109,111 @@ module.exports = function (app) {
           }, 0);
         };
 
-        $scope.openDdf = function() {
+        $scope.openDdf = function () {
           if ($scope.tabs.length === 0) {
             //if there are no tabs - create one
             $scope.newTab();
           }
           //render graph when tab is rendered
-          $timeout(function() {
+          $timeout(function () {
+            var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
 
-            console.log($scope.ddf.url, $scope.ddf.type);
 
+            /*var o = {
+              "data": {
+                "path": "chrome-extension://bbieimdbfepbpdinkindflpikiefkpfa/data/graphs/dont-panic-poverty-2005.csv",
+                "geoPath": "chrome-extension://bbieimdbfepbpdinkindflpikiefkpfa/data/geo.json",
+                "reader": "safe-csv",
+                "splash": true
+              },
+              "ui": {
+                "buttons": ["find", "axes", "size", "colors", "trails", "lock", "moreoptions", "fullscreen"],
+                "buttons_expand": ["colors", "find", "size"]
+              }
+            }*/
+
+
+            var opts = {
+              data: {
+                path: $scope.ddf.url,
+                reader: 'ddfcsv',
+                splash: true
+              },
+              ui: {
+                buttons: ["find", "axes", "size", "colors", "trails", "lock", "moreoptions", "fullscreen"],
+                buttons_expand: ["colors", "find", "size"]
+              },
+              state: {
+                time: {
+                  start: "1800",
+                  end: "2015",
+                  value: "2015",
+                  step: 1,
+                  formatInput: "%Y",
+                  trails: true,
+                  lockNonSelected: 0,
+                  adaptMinMaxZoom: false
+                },
+                entities: {
+                  dim: "geo",
+                  show: {
+                    "geo.cat": ["country"]
+                  }
+                },
+                marker: {
+                  space: ["entities", "time"],
+                  type: "geometry",
+                  shape: "circle",
+                  label: {
+                    use: "property",
+                    which: "geo.name"
+                  },
+                  axis_y: {
+                    use: "indicator",
+                    which: "fertility_rate",
+                    scaleType: "linear",
+                    allow: {
+                      scales: ["linear", "log"]
+                    }
+                  },
+                  axis_x: {
+                    use: "indicator",
+                    which: "life_expectancy",
+                    scaleType: "log",
+                    allow: {
+                      scales: ["linear", "log"]
+                    }
+                  },
+                  color: {
+                    use: "property",
+                    which: "geo.region",
+                    scaleType: "ordinal",
+                    allow: {
+                      names: ["!geo.name"]
+                    },
+                    palette: {
+                      asia: "#FF5872",
+                      europe: "#FFE700",
+                      americas: "#7FEB00",
+                      africa: "#00D5E9",
+                      _default: "#ffb600"
+                    }
+                  },
+                  size: {
+                    use: "indicator",
+                    which: "population",
+                    scaleType: "linear",
+                    allow: {
+                      scales: ["linear", "log"]
+                    },
+                    min: .04,
+                    max: .90
+                  }
+                }
+              }
+            };
+
+            vizabiFactory.render($scope.ddf.type, placeholder, opts);
           }, 0);
         };
 
@@ -152,7 +247,9 @@ module.exports = function (app) {
 
         function renderGraph(graph) {
           var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
-          //console.log(graph.tool, placeholder, graph.opts);
+          setTimeout(function (){
+            console.log('!!!', JSON.stringify(graph.opts));
+          }, 1000);
           vizabiFactory.render(graph.tool, placeholder, graph.opts);
         }
 
