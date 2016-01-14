@@ -1,6 +1,6 @@
 require('d3');
 var Vizabi = require('vizabi');
-Vizabi._globals.gapminder_paths.baseUrl = '/ddf/';
+//Vizabi._globals.gapminder_paths.baseUrl = '/ddf/';
 
 var FILE_CACHED = {};
 var FILE_REQUESTED = {};
@@ -13,6 +13,298 @@ var CACHE = {
 var GEO = 1;
 var MEASURES_TIME_PERIOD = 2;
 var MEASURES_TIME_FIXED = 3;
+
+Vizabi.Reader.extend('ddfcsv', {
+
+  /**
+   * Initializes the reader.
+   * @param {Object} reader_info Information about the reader
+   */
+  init: function (reader_info) {
+    this._name = 'ddf-csv';
+    this._data = [];
+    this._basepath = '/ddf/';
+    //this._ddfPath = 'https://raw.githubusercontent.com/open-numbers/ddf--gapminder--systema_globalis/master';
+    this._ddfPath = 'https://raw.githubusercontent.com/buchslava/ddf--gapminder--systema_globalis/master';
+    this._formatters = reader_info.formatters;
+    this.indexPath = this._ddfPath + '/ddf--index.csv';
+    this.dimensionPath = this._ddfPath + '/ddf--dimensions.csv';
+    this._formatters = reader_info.formatters;
+  },
+
+  /**
+   * Reads from source
+   * @param {Object} query to be performed
+   * @param {String} language language
+   * @returns a promise that will be resolved when data is read
+   */
+  read: function (queryPar, language) {
+    // todo: add groupby processing
+
+    var _this = this;
+    var query = deepExtend({}, queryPar);
+
+    _this.queryDescriptor = new QueryDescriptor(queryPar);
+
+    if (_this.queryDescriptor.type === GEO) {
+      return new Promise(function (resolve) {
+        _this.geoProcessing(1, function () {
+          _this._data = _this.getGeoData(_this.queryDescriptor);
+          console.log('!GEO DATA', _this._data);
+          resolve();
+        });
+      });
+    }
+
+    if (_this.queryDescriptor.type === MEASURES_TIME_PERIOD ||
+      _this.queryDescriptor.type === MEASURES_TIME_FIXED) {
+
+      return new Promise(function (resolve) {
+        _this.getIndex().then(function () {
+          Promise
+            .all(_this.getExpectedMeasures(query))
+            .then(function () {
+              var result = [];
+              var geo = DATA_CACHED['geo-' + _this.queryDescriptor.category];
+
+              var d1 = (new Date(_this.queryDescriptor.timeFrom)).getFullYear();
+              var d2 = (new Date(_this.queryDescriptor.timeTo)).getFullYear();
+
+              for (var year = d1; year <= d2; year++) {
+
+                for (var geoIndex = 0; geoIndex < geo.length; geoIndex++) {
+                  var line = {
+                    'geo': geo[geoIndex].geo,
+                    'time': year + ''
+                  };
+
+                  if (_this.injectMeasureValues(query, line, geoIndex, year) === true) {
+                    result.push(line);
+                  }
+                }
+              }
+
+              _this._data = mapRows(result, _this._formatters);
+
+              console.log('!QUERY', JSON.stringify(query));
+              console.log('!OUT DATA', _this._data);
+              console.log('!METADATA', Vizabi._globals.metadata);
+
+              resolve();
+            });
+        });
+      });
+    }
+  },
+
+  /**
+   * Gets the data
+   * @returns all data
+   */
+  getData: function () {
+    return this._data;
+  },
+
+  geoProcessing: function (n, cb) {
+    var _this = this;
+    _this.getDimensions().then(function () {
+      Promise
+        .all(_this.getDimensionsDetails())
+        .then(function () {
+          cb();
+        });
+    });
+  },
+
+  injectMeasureValues: function (query, line, geoIndex, year) {
+    var f = 0;
+    var measures = this.getMeasuresNames(query);
+    var geo = DATA_CACHED['geo-' + this.queryDescriptor.category];
+
+    measures.forEach(function (m) {
+      var measureCache = FILE_CACHED[CACHE.measureFileToName[m]];
+
+      if (measureCache && measureCache[geo[geoIndex].geo]) {
+        if (measureCache[geo[geoIndex].geo] && measureCache[geo[geoIndex].geo][year + ''] &&
+          measureCache[geo[geoIndex].geo][year + ''][m]) {
+          line[m] = Number(measureCache[geo[geoIndex].geo][year + ''][m]);
+          f++;
+        }
+      }
+    });
+
+    return f === measures.length;
+  },
+
+  getIndex: function () {
+    return this.load(this.indexPath);
+  },
+
+  getDimensions: function () {
+    return this.load(this.dimensionPath);
+  },
+
+  getGeoData: function (queryDescriptor) {
+    var adapters = {
+      country: function (geoRecord) {
+        return {
+          geo: geoRecord.geo,
+          'geo.name': geoRecord.name,
+          'geo.cat': queryDescriptor.category,
+          'geo.region': geoRecord.world_4region
+        }
+      }
+    };
+
+    var expectedGeoData = null;
+    for (var k in FILE_CACHED) {
+      if (FILE_CACHED.hasOwnProperty(k) &&
+        k.indexOf('ddf--list--geo--' + queryDescriptor.category) >= 0) {
+        expectedGeoData = FILE_CACHED[k];
+        break;
+      }
+    }
+
+    var result = [];
+    if (expectedGeoData !== null) {
+      expectedGeoData.forEach(function (d) {
+        result.push(adapters[queryDescriptor.category](d));
+      });
+    }
+
+    DATA_CACHED['geo-' + queryDescriptor.category] = result;
+    return result;
+  },
+
+  getMeasuresNames: function (query) {
+    var res = [];
+    query.select.forEach(function (q) {
+      if (q !== 'time' && q !== 'geo') {
+        res.push(q);
+      }
+    });
+
+    return res;
+  },
+
+  getExpectedMeasures: function (query) {
+    var _this = this;
+    var expected = [];
+
+    FILE_CACHED[_this.indexPath].forEach(function (indexRecord) {
+      // todo: fix condition -> geo
+      if (query.select.indexOf(indexRecord.measure) >= 0 &&
+        (!query.where['geo.cat'] || query.where['geo.cat'].indexOf(indexRecord.geo) >= 0)) {
+        var path = _this._ddfPath + '/' + indexRecord.file;
+        // todo: swap...
+        CACHE.measureFileToName[indexRecord.measure] = path;
+        CACHE.measureNameToFile[path] = indexRecord.measure;
+        expected.push(_this.load(path));
+      }
+    });
+
+    return expected;
+  },
+
+  getDimensionsDetails: function () {
+    var _this = this;
+    var expected = [];
+
+    FILE_CACHED[_this.dimensionPath].forEach(function (dimensionRecord) {
+      // todo: remove this ugly hack after open numbers fixing
+      if (dimensionRecord.dimension !== 'geo' && dimensionRecord.dimension !== 'un_state') {
+        expected.push(_this.load(_this._ddfPath + '/ddf--list--geo--' + dimensionRecord.dimension + '.csv'));
+      }
+    });
+
+    return expected;
+  },
+
+  // todo: remove it after 'fetcher' implementation
+  _measureHashTransformer: function (measure, data) {
+    if (!measure) {
+      return data;
+    }
+
+    var hash = {};
+    data.forEach(function (d) {
+      if (!hash[d.geo]) {
+        hash[d.geo] = {};
+      }
+
+      if (!hash[d.geo][d.year]) {
+        hash[d.geo][d.year] = {};
+      }
+
+      hash[d.geo][d.year][measure] = d[measure];
+    });
+
+    return hash;
+  },
+
+  load: function (path) {
+    var _this = this;
+    if (!FILE_CACHED.hasOwnProperty(path) && !FILE_REQUESTED.hasOwnProperty(path)) {
+      /*d3.csv(path, function (error, res) {
+       if (!res) {
+       console.log('No permissions or empty file: ' + path, error);
+       return;
+       }
+
+       if (error) {
+       console.log('Error Happened While Loading CSV File: ' + path, error);
+       return;
+       }
+
+       FILE_CACHED[path] = _this._measureHashTransformer(CACHE.measureNameToFile[path], res);
+       FILE_REQUESTED[path].resolve();
+       });*/
+
+      ///
+      _this.readCsv(path, function (error, res) {
+        if (!res) {
+          console.log('No permissions or empty file: ' + path, error);
+        }
+
+        if (error) {
+          console.log('Error Happened While Loading CSV File: ' + path, error);
+        }
+
+        FILE_CACHED[path] = _this._measureHashTransformer(CACHE.measureNameToFile[path], res);
+        FILE_REQUESTED[path].resolve();
+      });
+      ///
+    }
+
+    FILE_REQUESTED[path] = new Promise();
+
+    return FILE_REQUESTED[path];
+  },
+  readCsv: function (path, cb) {
+    var _this = this;
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = 'text';
+    xhr.open('GET', path, true);
+    var res = [];
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+        res = parseCSVToObject(xhr.response);
+        FILE_CACHED[path] = _this._measureHashTransformer(CACHE.measureNameToFile[path], res);
+
+        cb(xhr.status == 200 ? null : xhr.status, res);
+      } else if (xhr.readyState == XMLHttpRequest.DONE) {
+        console.log('can\'t load file');
+
+        cb(xhr.status == 200 ? null : xhr.status, res);
+      }
+    };
+
+    xhr.send();
+  }
+});
+
+require('vizabi/build/dist/vizabi.css');
 
 function parseCSVToObject(csv) {
   var chars = csv.split('');
@@ -406,351 +698,130 @@ function mapRows(original, formatters) {
   return original;
 }
 
-///////////////////////////////////////////////
-
-Vizabi.Reader.extend('ddfcsv', {
-
-  /**
-   * Initializes the reader.
-   * @param {Object} reader_info Information about the reader
-   */
-  init: function (reader_info) {
-    this._name = 'ddf-csv';
-    this._data = [];
-    this._basepath = reader_info.path;
-    //this._ddfPath = 'https://raw.githubusercontent.com/open-numbers/ddf--gapminder--systema_globalis/master';
-    this._ddfPath = 'https://raw.githubusercontent.com/buchslava/ddf--gapminder--systema_globalis/master';
-    this._formatters = reader_info.formatters;
-    this.indexPath = this._ddfPath + '/ddf--index.csv';
-    this.dimensionPath = this._ddfPath + '/ddf--dimensions.csv';
-
-    this._formatters = reader_info.formatters;
-  },
-
-  /**
-   * Reads from source
-   * @param {Object} query to be performed
-   * @param {String} language language
-   * @returns a promise that will be resolved when data is read
-   */
-  read: function (query, language) {
-    // todo: add groupby processing
-
-    var _this = this;
-
-    if (query.where) {
-      query.where = mapRows([query.where], _this._formatters)[0];
-    }
-    console.log(query);
-
-    _this.queryDescriptor = new QueryDescriptor(query);
-
-    if (_this.queryDescriptor.type === GEO) {
-      return new Promise(function (resolve) {
-        console.log(0);
-        _this.geoProcessing(1, function () {
-          console.log(1);
-          _this._data = _this.getGeoData(_this.queryDescriptor);
-          console.log('!GEO DATA', _this._data);
-          resolve();
-        });
-      });
-    }
-
-    if (_this.queryDescriptor.type === MEASURES_TIME_PERIOD ||
-      _this.queryDescriptor.type === MEASURES_TIME_FIXED) {
-
-      return new Promise(function (resolve) {
-        console.log(2);
-        //_this.geoProcessing(2, function () {
-          console.log(3);
-          _this.getIndex().then(function () {
-            Promise
-              .all(_this.getExpectedMeasures(query))
-              .then(function () {
-                var result = [];
-                var geo = DATA_CACHED['geo-' + _this.queryDescriptor.category];
-
-                //console.log(_this.queryDescriptor.timeFrom, _this.queryDescriptor.timeTo, JSON.stringify(_this.queryDescriptor.query));
-
-                for (var year = 1800; year <= 2015; year++) {
-
-                  //for (var year = _this.queryDescriptor.timeFrom;
-                  // year <= _this.queryDescriptor.timeTo; year++) {
-
-                  for (var geoIndex = 0; geoIndex < geo.length; geoIndex++) {
-                    var line = {
-                      'geo': geo[geoIndex].geo,
-                      //'time': new Date(year + '')
-                      'time': year + ''
-                    };
-
-                    if (_this.injectMeasureValues(query, line, geoIndex, year) === true) {
-                      result.push(line);
-                    }
-                  }
-                }
-
-                _this._data = _this.format(result);
-
-                console.log('!QUERY', JSON.stringify(query));
-                console.log('!OUT DATA', _this._data);
-                console.log('!METADATA', Vizabi._globals.metadata);
-
-                resolve();
-              });
-          });
-        //});
-      });
-    }
-  },
-
-  /**
-   * Gets the data
-   * @returns all data
-   */
-  getData: function () {
-    return this._data;
-  },
-
-  format: function (res) {
-    var _this = this;
-
-    //make category an array and fix missing regions
-    res = res.map(function (row) {
-      if (row['geo.cat']) {
-        row['geo.cat'] = [row['geo.cat']];
-      }
-      if (row['geo.region'] || row['geo']) {
-        row['geo.region'] = row['geo.region'] || row['geo'];
-      }
-      return row;
-    });
-
-    //format data
-    res = mapRows(res, _this._formatters);
-
-    //TODO: fix this hack with appropriate ORDER BY
-    //      plus do it AFTER parsing so you dont sort unneeded rows
-    //order by formatted
-    //sort records by time
-    var keys = Object.keys(_this._formatters);
-    var order_by = keys[0];
-    //if it has time
-    if (res[0][order_by]) {
-      res.sort(function (a, b) {
-        return a[order_by] - b[order_by];
-      });
-    }
-    //end of hack
-
-    return res;
-  },
-
-  geoProcessing: function (n, cb) {
-    var _this = this;
-
-    console.log('+', n, _this.getDimensions());
-
-    _this.getDimensions().then(function () {
-      console.log('000', _this.getDimensionsDetails());
-      Promise
-        .all(_this.getDimensionsDetails())
-        .then(function () {
-          console.log('+++', n);
-          cb();
-        });
-    });
-  },
-
-  injectMeasureValues: function (query, line, geoIndex, year) {
-    var f = 0;
-    var measures = this.getMeasuresNames(query);
-    var geo = DATA_CACHED['geo-' + this.queryDescriptor.category];
-
-    measures.forEach(function (m) {
-      var measureCache = FILE_CACHED[CACHE.measureFileToName[m]];
-
-      if (measureCache && measureCache[geo[geoIndex].geo]) {
-        if (measureCache[geo[geoIndex].geo] && measureCache[geo[geoIndex].geo][year + ''] &&
-          measureCache[geo[geoIndex].geo][year + ''][m]) {
-          line[m] = Number(measureCache[geo[geoIndex].geo][year + ''][m]);
-          f++;
-        }
-      }
-    });
-
-    return f === measures.length;
-  },
-
-  getIndex: function () {
-    return this.load(this.indexPath);
-  },
-
-  getDimensions: function () {
-    return this.load(this.dimensionPath);
-  },
-
-  getGeoData: function (queryDescriptor) {
-    var adapters = {
-      country: function (geoRecord) {
-        return {
-          geo: geoRecord.geo,
-          'geo.name': geoRecord.name,
-          'geo.cat': queryDescriptor.category,
-          'geo.region': geoRecord.world_4region
-        }
-      }
-    };
-
-    var expectedGeoData = null;
-    for (var k in FILE_CACHED) {
-      if (FILE_CACHED.hasOwnProperty(k) &&
-        k.indexOf('ddf--list--geo--' + queryDescriptor.category) >= 0) {
-        expectedGeoData = FILE_CACHED[k];
+function forEach(obj, callback, ctx) {
+  if (!obj) {
+    return;
+  }
+  var i, size;
+  if (isArray(obj)) {
+    size = obj.length;
+    for (i = 0; i < size; i += 1) {
+      if (callback.apply(ctx, [
+          obj[i],
+          i
+        ]) === false) {
         break;
       }
     }
-
-    var result = [];
-    if (expectedGeoData !== null) {
-      expectedGeoData.forEach(function (d) {
-        result.push(adapters[queryDescriptor.category](d));
-      });
+  } else {
+    var keys = Object.keys(obj);
+    size = keys.length;
+    for (i = 0; i < size; i += 1) {
+      if (callback.apply(ctx, [
+          obj[keys[i]],
+          keys[i]
+        ]) === false) {
+        break;
+      }
     }
-
-    DATA_CACHED['geo-' + queryDescriptor.category] = result;
-    return result;
-  },
-
-  getMeasuresNames: function (query) {
-    var res = [];
-    query.select.forEach(function (q) {
-      if (q !== 'time' && q !== 'geo') {
-        res.push(q);
-      }
-    });
-
-    return res;
-  },
-
-  getExpectedMeasures: function (query) {
-    var _this = this;
-    var expected = [];
-
-    FILE_CACHED[_this.indexPath].forEach(function (indexRecord) {
-      // todo: fix condition -> geo
-      if (query.select.indexOf(indexRecord.measure) >= 0 &&
-        (!query.where['geo.cat'] || query.where['geo.cat'].indexOf(indexRecord.geo) >= 0)) {
-        var path = _this._ddfPath + '/' + indexRecord.file;
-        // todo: swap...
-        CACHE.measureFileToName[indexRecord.measure] = path;
-        CACHE.measureNameToFile[path] = indexRecord.measure;
-        expected.push(_this.load(path));
-      }
-    });
-
-    return expected;
-  },
-
-  getDimensionsDetails: function () {
-    var _this = this;
-    var expected = [];
-
-    console.log('++', FILE_CACHED[_this.dimensionPath]);
-
-    FILE_CACHED[_this.dimensionPath].forEach(function (dimensionRecord) {
-      // todo: remove this ugly hack after open numbers fixing
-      if (dimensionRecord.dimension !== 'geo' && dimensionRecord.dimension !== 'un_state') {
-        expected.push(_this.load(_this._ddfPath + '/ddf--list--geo--' + dimensionRecord.dimension + '.csv'));
-      }
-    });
-
-    return expected;
-  },
-
-  // todo: remove it after 'fetcher' implementation
-  _measureHashTransformer: function (measure, data) {
-    if (!measure) {
-      return data;
-    }
-
-    var hash = {};
-    data.forEach(function (d) {
-      if (!hash[d.geo]) {
-        hash[d.geo] = {};
-      }
-
-      if (!hash[d.geo][d.year]) {
-        hash[d.geo][d.year] = {};
-      }
-
-      hash[d.geo][d.year][measure] = d[measure];
-    });
-
-    return hash;
-  },
-
-  load: function (path) {
-    var _this = this;
-    if (!FILE_CACHED.hasOwnProperty(path) && !FILE_REQUESTED.hasOwnProperty(path)) {
-      /*d3.csv(path, function (error, res) {
-        if (!res) {
-          console.log('No permissions or empty file: ' + path, error);
-          return;
-        }
-
-        if (error) {
-          console.log('Error Happened While Loading CSV File: ' + path, error);
-          return;
-        }
-
-        FILE_CACHED[path] = _this._measureHashTransformer(CACHE.measureNameToFile[path], res);
-        FILE_REQUESTED[path].resolve();
-      });*/
-
-      ///
-      _this.readCsv(path, function (error, res) {
-        if (!res) {
-          console.log('No permissions or empty file: ' + path, error);
-        }
-
-        if (error) {
-          console.log('Error Happened While Loading CSV File: ' + path, error);
-        }
-
-        FILE_CACHED[path] = _this._measureHashTransformer(CACHE.measureNameToFile[path], res);
-        FILE_REQUESTED[path].resolve();
-      });
-      ///
-    }
-
-    FILE_REQUESTED[path] = new Promise();
-
-    return FILE_REQUESTED[path];
-  },
-  readCsv: function (path, cb) {
-    var _this = this;
-    var xhr = new XMLHttpRequest();
-    xhr.responseType = 'text';
-    xhr.open('GET', path, true);
-    var res = [];
-
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-        res = parseCSVToObject(xhr.response);
-        FILE_CACHED[path] = _this._measureHashTransformer(CACHE.measureNameToFile[path], res);
-
-        cb(xhr.status == 200 ? null : xhr.status, res);
-      } else if (xhr.readyState == XMLHttpRequest.DONE) {
-        console.log('can\'t load file');
-
-        cb(xhr.status == 200 ? null : xhr.status, res);
-      }
-    };
-
-    xhr.send();
   }
-});
+}
 
-require('vizabi/build/dist/vizabi.css');
+function isSpecificValue(val) {
+  return (
+    val instanceof Date
+    || val instanceof RegExp
+  ) ? true : false;
+}
+
+function cloneSpecificValue(val) {
+  if (val instanceof Date) {
+    return new Date(val.getTime());
+  } else if (val instanceof RegExp) {
+    return new RegExp(val);
+  } else {
+    throw new Error('Unexpected situation');
+  }
+}
+
+function deepCloneArray(arr) {
+  var clone = [];
+  forEach(arr, function (item, index) {
+    if (typeof item === 'object' && item !== null) {
+      if (isArray(item)) {
+        clone[index] = deepCloneArray(item);
+      } else if (isSpecificValue(item)) {
+        clone[index] = cloneSpecificValue(item);
+      } else {
+        clone[index] = deepExtend({}, item);
+      }
+    } else {
+      clone[index] = item;
+    }
+  });
+  return clone;
+}
+
+function deepExtend(/*obj_1, [obj_2], [obj_N]*/) {
+  if (arguments.length < 1 || typeof arguments[0] !== 'object') {
+    return false;
+  }
+
+  if (arguments.length < 2) {
+    return arguments[0];
+  }
+
+  var target = arguments[0];
+
+  // convert arguments to array and cut off target object
+  var args = Array.prototype.slice.call(arguments, 1);
+
+  var val, src, clone;
+
+  forEach(args, function (obj) {
+    // skip argument if it is array or isn't object
+    if (typeof obj !== 'object' || isArray(obj)) {
+      return;
+    }
+
+    forEach(Object.keys(obj), function (key) {
+      src = target[key]; // source value
+      val = obj[key]; // new value
+
+      // recursion prevention
+      if (val === target) {
+        return;
+
+        /**
+         * if new value isn't object then just overwrite by new value
+         * instead of extending.
+         */
+      } else if (typeof val !== 'object' || val === null) {
+        target[key] = val;
+        return;
+
+        // just clone arrays (and recursive clone objects inside)
+      } else if (isArray(val)) {
+        target[key] = deepCloneArray(val);
+        return;
+
+        // custom cloning and overwrite for specific objects
+      } else if (isSpecificValue(val)) {
+        target[key] = cloneSpecificValue(val);
+        return;
+
+        // overwrite by new value if source isn't object or array
+      } else if (typeof src !== 'object' || src === null || isArray(src)) {
+        target[key] = deepExtend({}, val);
+        return;
+
+        // source value and new value is objects both, extending...
+      } else {
+        target[key] = deepExtend(src, val);
+        return;
+      }
+    });
+  });
+
+  return target;
+}

@@ -105,6 +105,7 @@ module.exports = function (app) {
             }).indexOf($scope.currentTab);
             $scope.tabs[tabIndex].graphName = graph.name;
             $scope.selectedGraph = graph.name;
+            Vizabi._globals.gapminder_paths.baseUrl = '/';
             renderGraph(graph);
           }, 0);
         };
@@ -117,27 +118,11 @@ module.exports = function (app) {
           //render graph when tab is rendered
           $timeout(function () {
             var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
-
-
-            /*var o = {
-              "data": {
-                "path": "chrome-extension://bbieimdbfepbpdinkindflpikiefkpfa/data/graphs/dont-panic-poverty-2005.csv",
-                "geoPath": "chrome-extension://bbieimdbfepbpdinkindflpikiefkpfa/data/geo.json",
-                "reader": "safe-csv",
-                "splash": true
-              },
-              "ui": {
-                "buttons": ["find", "axes", "size", "colors", "trails", "lock", "moreoptions", "fullscreen"],
-                "buttons_expand": ["colors", "find", "size"]
-              }
-            }*/
-
-
             var opts = {
               data: {
                 path: $scope.ddf.url,
                 reader: 'ddfcsv',
-                splash: true
+                splash: false
               },
               ui: {
                 buttons: ["find", "axes", "size", "colors", "trails", "lock", "moreoptions", "fullscreen"],
@@ -213,6 +198,7 @@ module.exports = function (app) {
               }
             };
 
+            Vizabi._globals.gapminder_paths.baseUrl = '/ddf/';
             vizabiFactory.render($scope.ddf.type, placeholder, opts);
           }, 0);
         };
@@ -247,9 +233,6 @@ module.exports = function (app) {
 
         function renderGraph(graph) {
           var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
-          setTimeout(function (){
-            console.log('!!!', JSON.stringify(graph.opts));
-          }, 1000);
           vizabiFactory.render(graph.tool, placeholder, graph.opts);
         }
 
