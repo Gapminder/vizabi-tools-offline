@@ -1,6 +1,5 @@
 require('d3');
 var Vizabi = require('vizabi');
-//Vizabi._globals.gapminder_paths.baseUrl = '/ddf/';
 
 var FILE_CACHED = {};
 var FILE_REQUESTED = {};
@@ -193,12 +192,12 @@ Vizabi.Reader.extend('ddfcsv', {
 
     FILE_CACHED[_this.indexPath].forEach(function (indexRecord) {
       // todo: fix condition -> geo
-      if (query.select.indexOf(indexRecord.measure) >= 0 &&
+      if (query.select.indexOf(indexRecord.value_concept) >= 0 &&
         (!query.where['geo.cat'] || query.where['geo.cat'].indexOf(indexRecord.geo) >= 0)) {
         var path = _this._ddfPath + '/' + indexRecord.file;
         // todo: swap...
-        CACHE.measureFileToName[indexRecord.measure] = path;
-        CACHE.measureNameToFile[path] = indexRecord.measure;
+        CACHE.measureFileToName[indexRecord.value_concept] = path;
+        CACHE.measureNameToFile[path] = indexRecord.value_concept;
         expected.push(_this.load(path));
       }
     });
@@ -212,8 +211,8 @@ Vizabi.Reader.extend('ddfcsv', {
 
     FILE_CACHED[_this.dimensionPath].forEach(function (dimensionRecord) {
       // todo: remove this ugly hack after open numbers fixing
-      if (dimensionRecord.dimension !== 'geo' && dimensionRecord.dimension !== 'un_state') {
-        expected.push(_this.load(_this._ddfPath + '/ddf--list--geo--' + dimensionRecord.dimension + '.csv'));
+      if (dimensionRecord.concept !== 'geo' && dimensionRecord.concept !== 'un_state') {
+        expected.push(_this.load(_this._ddfPath + '/ddf--list--geo--' + dimensionRecord.concept + '.csv'));
       }
     });
 
