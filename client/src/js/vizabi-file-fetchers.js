@@ -73,7 +73,7 @@ function parseCSVToObject(csv) {
   return result;
 }
 
-function genericReader(path, cb) {
+function genericFetcher(path, cb) {
   var xhr = new XMLHttpRequest();
   xhr.responseType = 'text';
   xhr.open('GET', path, true);
@@ -94,5 +94,5 @@ function genericReader(path, cb) {
   xhr.send();
 }
 
-exports.d3Reader = d3.csv;
-exports.genericReader = genericReader;
+exports.d3Fetcher = d3.csv;
+exports.genericFetcher = genericFetcher;

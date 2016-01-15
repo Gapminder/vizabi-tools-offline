@@ -19,6 +19,10 @@ Vizabi.Reader.extend('ddfcsv', {
     this.indexPath = this._ddfPath + '/ddf--index.csv';
     this.dimensionPath = this._ddfPath + '/ddf--dimensions.csv';
     this._formatters = reader_info.formatters;
+
+    if (reader_info.fileFetcher) {
+      ddfUtils.fileFetcher = reader_info.fileFetcher;
+    }
   },
 
   /**

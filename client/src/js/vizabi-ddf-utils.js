@@ -1,6 +1,6 @@
 var Promise = (require('./vizabi-extract-promise')).Promise;
 var fileFetchers = require('./vizabi-file-fetchers');
-var fileFetcher = fileFetchers.genericReader;
+var fileFetcher = fileFetchers.genericFetcher;
 
 var GEO = 1;
 var MEASURES_TIME_PERIOD = 2;
@@ -122,3 +122,4 @@ exports.QueryDescriptor = QueryDescriptor;
 exports.geoProcessing = geoProcessing;
 exports.getIndex = getIndex;
 exports.load = load;
+exports.fileFetcher = fileFetcher;

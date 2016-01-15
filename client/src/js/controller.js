@@ -1,5 +1,7 @@
 var Vizabi = require('vizabi');
 var async = require('async');
+var fileFetchers = require('./vizabi-file-fetchers');
+var fileFetcher = fileFetchers.genericFetcher;
 
 module.exports = function (app) {
   app
@@ -68,7 +70,7 @@ module.exports = function (app) {
 
         $scope.mode = 'default';
         $scope.ddf = {
-          url: 'https://raw.githubusercontent.com/buchslava/ddf--gapminder--systema_globalis/master',
+          url: 'https://raw.githubusercontent.com/open-numbers/ddf--gapminder--systema_globalis/master',
           type: 'BubbleChart',
           types: [
             {value: 'BubbleChart', name: 'Bubble Chart'},
@@ -122,6 +124,7 @@ module.exports = function (app) {
               data: {
                 path: $scope.ddf.url,
                 reader: 'ddfcsv',
+                fileFetcher: fileFetcher,
                 splash: false
               },
               ui: {
