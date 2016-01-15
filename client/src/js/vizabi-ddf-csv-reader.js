@@ -2,8 +2,6 @@ require('d3');
 var Vizabi = require('vizabi');
 var Promise = (require('./vizabi-extract-promise')).Promise;
 var utils = require('./vizabi-extract-utils');
-/*var fileReaders = require('./vizabi-file-readers');
- var fileReader = fileReaders.genericReader;*/
 var ddfUtils = require('./vizabi-ddf-utils');
 
 Vizabi.Reader.extend('ddfcsv', {
@@ -16,7 +14,7 @@ Vizabi.Reader.extend('ddfcsv', {
     this._name = 'ddf-csv';
     this._data = [];
     this._basepath = '/ddf/';
-    this._ddfPath = 'https://raw.githubusercontent.com/buchslava/ddf--gapminder--systema_globalis/master';
+    this._ddfPath = 'https://raw.githubusercontent.com/open-numbers/ddf--gapminder--systema_globalis/master';
     this._formatters = reader_info.formatters;
     this.indexPath = this._ddfPath + '/ddf--index.csv';
     this.dimensionPath = this._ddfPath + '/ddf--dimensions.csv';
@@ -96,17 +94,6 @@ Vizabi.Reader.extend('ddfcsv', {
     return this._data;
   },
 
-  /*geoProcessing: function (n, cb) {
-   var _this = this;
-   _this.getDimensions().then(function () {
-   Promise
-   .all(_this.getDimensionsDetails())
-   .then(function () {
-   cb();
-   });
-   });
-   },*/
-
   injectMeasureValues: function (query, line, geoIndex, year) {
     var f = 0;
     var measures = this.getMeasuresNames(query);
@@ -126,14 +113,6 @@ Vizabi.Reader.extend('ddfcsv', {
 
     return f === measures.length;
   },
-
-  /*getIndex: function () {
-   return this.load(this.indexPath);
-   },
-
-   getDimensions: function () {
-   return this.load(this.dimensionPath);
-   },*/
 
   getGeoData: function (queryDescriptor) {
     var adapters = {
@@ -196,92 +175,6 @@ Vizabi.Reader.extend('ddfcsv', {
 
     return expected;
   }
-
-  /*getDimensionsDetails: function () {
-   var _this = this;
-   var expected = [];
-
-   FILE_CACHED[_this.dimensionPath].forEach(function (dimensionRecord) {
-   if (dimensionRecord.concept !== 'geo' && dimensionRecord.concept !== 'un_state') {
-   expected.push(_this.load(_this._ddfPath + '/ddf--list--geo--' + dimensionRecord.concept + '.csv'));
-   }
-   });
-
-   return expected;
-   },
-
-   _measureHashTransformer: function (measure, data) {
-   if (!measure) {
-   return data;
-   }
-
-   var hash = {};
-   data.forEach(function (d) {
-   if (!hash[d.geo]) {
-   hash[d.geo] = {};
-   }
-
-   if (!hash[d.geo][d.year]) {
-   hash[d.geo][d.year] = {};
-   }
-
-   hash[d.geo][d.year][measure] = d[measure];
-   });
-
-   return hash;
-   },
-
-   load: function (path) {
-   var _this = this;
-   if (!ddfUtils.CACHE.FILE_CACHED.hasOwnProperty(path) && !ddfUtils.CACHE.FILE_REQUESTED.hasOwnProperty(path)) {
-   fileReader(path, function (error, res) {
-   if (!res) {
-   console.log('No permissions or empty file: ' + path, error);
-   }
-
-   if (error) {
-   console.log('Error Happened While Loading CSV File: ' + path, error);
-   }
-
-   ddfUtils.CACHE.FILE_CACHED[path] =
-   _this._measureHashTransformer(ddfUtils.CACHE.measureNameToFile[path], res);
-   ddfUtils.CACHE.FILE_REQUESTED[path].resolve();
-   });
-   }
-
-   ddfUtils.CACHE.FILE_REQUESTED[path] = new Promise();
-
-   return ddfUtils.CACHE.FILE_REQUESTED[path];
-   }*/
 });
 
 require('vizabi/build/dist/vizabi.css');
-
-/*function QueryDescriptor(query) {
- var _this = this;
- _this.query = query;
- _this.geoCat = query.where['geo.cat'];
- var result;
-
- if (query.select.indexOf('geo.name') >= 0 || query.select.indexOf('geo.region') >= 0) {
- _this.type = GEO;
- _this.category = _this.geoCat[0];
- }
-
- if (!result && query.where && query.where.time) {
- if (query.where.time.length > 0 && query.where.time[0].length === 1) {
- _this.type = MEASURES_TIME_FIXED;
- _this.category = _this.geoCat[0];
- _this.timeFrom = Number(query.where.time[0][0]);
- _this.timeTo = Number(query.where.time[0][0]);
- }
-
- if (query.where.time.length > 0 && query.where.time[0].length === 2) {
- _this.type = MEASURES_TIME_PERIOD;
- _this.category = _this.geoCat[0];
- _this.timeFrom = Number(query.where.time[0][0]);
- _this.timeTo = Number(query.where.time[0][1]);
- }
- }
- }
- */

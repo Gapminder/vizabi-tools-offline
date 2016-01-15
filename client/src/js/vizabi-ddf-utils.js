@@ -1,6 +1,6 @@
 var Promise = (require('./vizabi-extract-promise')).Promise;
-var fileReaders = require('./vizabi-file-readers');
-var fileReader = fileReaders.genericReader;
+var fileFetchers = require('./vizabi-file-fetchers');
+var fileFetcher = fileFetchers.genericReader;
 
 var GEO = 1;
 var MEASURES_TIME_PERIOD = 2;
@@ -63,7 +63,7 @@ function getDimensions(dimensionPath) {
 function getDimensionsDetails(ddfPath, dimensionPath) {
   var expected = [];
 
-s  CACHE.FILE_CACHED[dimensionPath].forEach(function (dimensionRecord) {
+  CACHE.FILE_CACHED[dimensionPath].forEach(function (dimensionRecord) {
     if (dimensionRecord.concept !== 'geo' && dimensionRecord.concept !== 'un_state') {
       expected.push(load(ddfPath + '/ddf--list--geo--' + dimensionRecord.concept + '.csv'));
     }
@@ -74,7 +74,7 @@ s  CACHE.FILE_CACHED[dimensionPath].forEach(function (dimensionRecord) {
 
 function load(path) {
   if (!CACHE.FILE_CACHED.hasOwnProperty(path) && !CACHE.FILE_REQUESTED.hasOwnProperty(path)) {
-    fileReader(path, function (error, res) {
+    fileFetcher(path, function (error, res) {
       if (!res) {
         console.log('No permissions or empty file: ' + path, error);
       }
