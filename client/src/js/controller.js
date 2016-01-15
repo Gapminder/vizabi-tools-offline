@@ -1,7 +1,5 @@
 var Vizabi = require('vizabi');
 var async = require('async');
-var fileFetchers = require('./vizabi-file-fetchers');
-var fileFetcher = fileFetchers.genericFetcher;
 
 module.exports = function (app) {
   app
@@ -124,7 +122,6 @@ module.exports = function (app) {
               data: {
                 path: $scope.ddf.url,
                 reader: 'ddfcsv',
-                fileFetcher: fileFetcher,
                 splash: false
               },
               ui: {

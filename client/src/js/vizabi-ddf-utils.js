@@ -1,6 +1,5 @@
+require('d3');
 var Promise = (require('./vizabi-extract-promise')).Promise;
-var fileFetchers = require('./vizabi-file-fetchers');
-var fileFetcher = fileFetchers.genericFetcher;
 
 var GEO = 1;
 var MEASURES_TIME_PERIOD = 2;
@@ -13,6 +12,8 @@ var CACHE = {
   FILE_REQUESTED: {},
   DATA_CACHED: {}
 };
+
+var EVALALLOWED = null;
 
 exports.GEO = GEO;
 exports.MEASURES_TIME_PERIOD = MEASURES_TIME_PERIOD;
@@ -73,8 +74,18 @@ function getDimensionsDetails(ddfPath, dimensionPath) {
 }
 
 function load(path) {
+
   if (!CACHE.FILE_CACHED.hasOwnProperty(path) && !CACHE.FILE_REQUESTED.hasOwnProperty(path)) {
-    fileFetcher(path, function (error, res) {
+    
+    // checks if eval() statements are allowed. They are needed for fast parsing by D3.
+    if (EVALALLOWED == null) defineEvalAllowed();
+
+    // true:  load using csv, which uses d3.csv.parse, is faster but doesn't comply with CSP
+    // false: load using text and d3.csv.parseRows to circumvent d3.csv.parse and comply with CSP
+    var loader = (EVALALLOWED) ? d3.csv : d3.text;
+    var parser = (EVALALLOWED) ? null : csvToObject;
+
+    loader(path, function(error, res) {
       if (!res) {
         console.log('No permissions or empty file: ' + path, error);
       }
@@ -82,6 +93,8 @@ function load(path) {
       if (error) {
         console.log('Error Happened While Loading CSV File: ' + path, error);
       }
+
+      if (parser) res = parser(res);
 
       CACHE.FILE_CACHED[path] = measureHashTransformer(CACHE.measureNameToFile[path], res);
       CACHE.FILE_REQUESTED[path].resolve();
@@ -91,6 +104,31 @@ function load(path) {
   CACHE.FILE_REQUESTED[path] = new Promise();
 
   return CACHE.FILE_REQUESTED[path];
+}
+
+function defineEvalAllowed() {
+  try {
+    new Function("", "");
+    EVALALLOWED = true;
+  } catch (ignore) {
+    // Content-Security-Policy does not allow "unsafe-eval".
+    EVALALLOWED = false;
+  }
+}
+
+// parsing csv string to an object, circumventing d3.parse which uses eval unsafe new Function() which doesn't comply with CSP
+// https://developer.chrome.com/apps/contentSecurityPolicy
+// https://github.com/mbostock/d3/pull/1910
+function csvToObject(res) {
+  var header;
+  return (res == null) ? null : d3.csv.parseRows(res, function(row, i) {
+    if (i) {
+      var o = {}, j = -1, m = header.length;
+      while (++j < m) o[header[j]] = row[j];
+      return o;
+    }
+    header = row;
+  });
 }
 
 function measureHashTransformer(measure, data) {
@@ -122,4 +160,3 @@ exports.QueryDescriptor = QueryDescriptor;
 exports.geoProcessing = geoProcessing;
 exports.getIndex = getIndex;
 exports.load = load;
-exports.fileFetcher = fileFetcher;
