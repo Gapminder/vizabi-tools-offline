@@ -7,7 +7,6 @@ if (!!(typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getMani
   Vizabi._globals.gapminder_paths.baseUrl = '/tools/api/static/';
 }
 
-
 var FILE_CACHED$2 = {}; //caches files from this reader
 
 Vizabi.Reader.extend('safe-csv', {
@@ -16,17 +15,17 @@ Vizabi.Reader.extend('safe-csv', {
    * Initializes the reader.
    * @param {Object} reader_info Information about the reader
    */
-  init: function(reader_info) {
+  init: function (reader_info) {
     console.log('reader info:');
     console.log(reader_info);
     this._name = 'test-csv';
     this._data = [];
     this._basepath = reader_info.path;
     this._geoPath = reader_info.geoPath;
-    this._formatters = reader_info.formatters;
-    if(!this._basepath) {
+
+    if (!this._basepath) {
       console.log("Missing base path for json reader");
-    };
+    }
   },
 
   /**
@@ -35,14 +34,14 @@ Vizabi.Reader.extend('safe-csv', {
    * @param {String} language language
    * @returns a promise that will be resolved when data is read
    */
-  read: function(query, language) {
+  read: function (query, language) {
     var _this = this;
     var path = this._basepath.replace("{{LANGUAGE}}", language);
     _this._data = [];
 
-    return new Promise(function(resolve) {
+    return new Promise(function (resolve) {
       //if cached, retrieve and parse
-      if(FILE_CACHED$2.hasOwnProperty(path)) {
+      if (FILE_CACHED$2.hasOwnProperty(path)) {
         parse(FILE_CACHED$2[path]);
       }
       //if not, request and parse
@@ -53,7 +52,7 @@ Vizabi.Reader.extend('safe-csv', {
 
         xhr.onreadystatechange = function () {
           if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-            getGeoData(_this._geoPath, function(err, geoData) {
+            getGeoData(_this._geoPath, function (err, geoData) {
               var graphData = parseCsv(xhr.response);
               graphData = mergeGeoIntoGraphData(geoData, graphData);
               var res = format([graphData]);
@@ -71,24 +70,11 @@ Vizabi.Reader.extend('safe-csv', {
       function format(res) {
         //TODO: Improve local json filtering
         //make category an array and fix missing regions
-        res = res[0].map(function(row) {
+        res = res[0].map(function (row) {
           row['geo.cat'] = [row['geo.cat']];
           row['geo.region'] = row['geo.region'] || row['geo'];
           return row;
         });
-
-        //format data
-        res = mapRows(res, _this._formatters);
-
-        //TODO: fix this hack with appropriate ORDER BY
-        //order by formatted
-        //sort records by time
-        var keys = Object.keys(_this._formatters);
-        var order_by = keys[0];
-        res.sort(function(a, b) {
-          return a[order_by] - b[order_by];
-        });
-        //end of hack
 
         return res;
       }
@@ -96,7 +82,7 @@ Vizabi.Reader.extend('safe-csv', {
       function getGeoData(path, cb) {
         var geoXhr = new XMLHttpRequest();
         geoXhr.responseType = 'json';
-        geoXhr.open('GET',  path, true);
+        geoXhr.open('GET', path, true);
         geoXhr.onreadystatechange = function () {
           if (geoXhr.readyState == XMLHttpRequest.DONE && geoXhr.status == 200) {
             cb(false, geoXhr.response);
@@ -108,13 +94,13 @@ Vizabi.Reader.extend('safe-csv', {
       }
 
       function mergeGeoIntoGraphData(geoData, graphData) {
-        var geoHash  = {};
+        var geoHash = {};
         for (var j = 0; j < geoData.length; j++) {
-          geoHash[geoData[j].geo]= geoData[j];
+          geoHash[geoData[j].geo] = geoData[j];
         }
 
         for (var i = 0; i < graphData.length; i++) {
-          graphData[i].time = graphData[i].time + '';
+          graphData[i].time = new Date(graphData[i].time + '');
           if (typeof geoHash[graphData[i].geo] === 'undefined') {
             //todo: log it
             continue;
@@ -135,55 +121,18 @@ Vizabi.Reader.extend('safe-csv', {
         resolve();
       }
 
-      var mapRows = function(original, formatters) {
-        function mapRow(value, fmt) {
-          if(!isArray(value)) {
-            return fmt(value);
-          } else {
-            var res = [];
-            for(var i = 0; i < value.length; i++) {
-              res[i] = mapRow(value[i], fmt);
-            }
-            return res;
-          }
-        }
-
-        var columns = Object.keys(formatters);
-        var columns_s = columns.length;
-        original = original.map(function(row) {
-          for(var i = 0; i < columns_s; i++) {
-            var col = columns[i],
-              new_val;
-            if(row.hasOwnProperty(col)) {
-              try {
-                new_val = mapRow(row[col], formatters[col]);
-              } catch(e) {
-                new_val = row[col];
-              }
-              row[col] = new_val;
-            }
-          }
-          return row;
-        });
-        return original;
-      };
-
-      var isArray = Array.isArray || function(obj) {
-        return toString.call(obj) === '[object Array]';
-      };
-
       function parseCsv(csv) {
-        var lines=csv.split("\n");
+        var lines = csv.split("\n");
         var result = [];
-        var headers=lines[0].split(",");
+        var headers = lines[0].split(",");
 
-        for(var i=1;i<lines.length;i++){
+        for (var i = 1; i < lines.length; i++) {
           if (!lines[i]) {
             continue;
           }
           var obj = {};
-          var currentline=lines[i].split(",");
-          for(var j=0;j<headers.length;j++){
+          var currentline = lines[i].split(",");
+          for (var j = 0; j < headers.length; j++) {
             obj[headers[j]] = currentline[j];
           }
           result.push(obj);
@@ -195,28 +144,28 @@ Vizabi.Reader.extend('safe-csv', {
 
       function parseCsvTest(csvString) {
         // The array we're going to build
-        var csvArray   = [];
+        var csvArray = [];
         // Break it into rows to start
-        var csvRows    = csvString.split(/\n/);
+        var csvRows = csvString.split(/\n/);
         // Take off the first line to get the headers, then split that into an array
         var csvHeaders = csvRows.shift().split(',');
 
-        if (csvRows[csvRows.length -1] === '') {
+        if (csvRows[csvRows.length - 1] === '') {
           csvRows.pop();
         }
         // Loop through remaining rows
-        for(var rowIndex = 0; rowIndex < csvRows.length; ++rowIndex){
-          var rowArray  = csvRows[rowIndex].split(',');
+        for (var rowIndex = 0; rowIndex < csvRows.length; ++rowIndex) {
+          var rowArray = csvRows[rowIndex].split(',');
 
           // Create a new row object to store our data.
           var rowObject = csvArray[rowIndex] = {};
 
           // Then iterate through the remaining properties and use the headers as keys
-          for(var propIndex = 0; propIndex < rowArray.length; ++propIndex){
+          for (var propIndex = 0; propIndex < rowArray.length; ++propIndex) {
             // Grab the value from the row array we're looping through...
-            var propValue =   rowArray[propIndex].replace(/^"|"$/g,'');
+            var propValue = rowArray[propIndex].replace(/^"|"$/g, '');
             // ...also grab the relevant header (the RegExp in both of these removes quotes)
-            var propLabel = csvHeaders[propIndex].replace(/^"|"$/g,'');
+            var propLabel = csvHeaders[propIndex].replace(/^"|"$/g, '');
 
             //if (propValue && !(propLabel in stringProperties) && typeof propValue !== 'number') {
             //  propValue = +propValue;
@@ -236,7 +185,7 @@ Vizabi.Reader.extend('safe-csv', {
    * Gets the data
    * @returns all data
    */
-  getData: function() {
+  getData: function () {
     return this._data;
   }
 });

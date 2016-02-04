@@ -1,9 +1,9 @@
 require('d3');
+var ddfTimeUtils = require('./vizabi-ddf-time-utils');
 var Promise = (require('./vizabi-extract-promise')).Promise;
 
 var GEO = 1;
-var MEASURES_TIME_PERIOD = 2;
-var MEASURES_TIME_FIXED = 3;
+var MEASURES_TIME = 2;
 
 var CACHE = {
   measureFileToName: {},
@@ -16,8 +16,7 @@ var CACHE = {
 var EVALALLOWED = null;
 
 exports.GEO = GEO;
-exports.MEASURES_TIME_PERIOD = MEASURES_TIME_PERIOD;
-exports.MEASURES_TIME_FIXED = MEASURES_TIME_FIXED;
+exports.MEASURES_TIME = MEASURES_TIME;
 exports.CACHE = CACHE;
 
 function QueryDescriptor(query) {
@@ -31,19 +30,9 @@ function QueryDescriptor(query) {
   }
 
   if (!result && query.where && query.where.time) {
-    if (query.where.time.length > 0 && query.where.time[0].length === 1) {
-      this.type = MEASURES_TIME_FIXED;
-      this.category = this.geoCat[0];
-      this.timeFrom = Number(query.where.time[0][0]);
-      this.timeTo = Number(query.where.time[0][0]);
-    }
-
-    if (query.where.time.length > 0 && query.where.time[0].length === 2) {
-      this.type = MEASURES_TIME_PERIOD;
-      this.category = this.geoCat[0];
-      this.timeFrom = Number(query.where.time[0][0]);
-      this.timeTo = Number(query.where.time[0][1]);
-    }
+    this.type = MEASURES_TIME;
+    this.category = this.geoCat[0];
+    this.timeRanges = ddfTimeUtils.getRange(query.where.time);
   }
 }
 
