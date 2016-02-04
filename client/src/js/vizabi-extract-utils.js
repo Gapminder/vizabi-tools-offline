@@ -4,42 +4,6 @@ var isArray = Array.isArray || function (obj) {
 
 exports.isArray = isArray;
 
-exports.mapRows = function mapRows(original, formatters) {
-
-  function mapRow(value, fmt) {
-    if (!isArray(value)) {
-      return fmt(value);
-    } else {
-      var res = [];
-      for (var i = 0; i < value.length; i++) {
-        res[i] = mapRow(value[i], fmt);
-      }
-      return res;
-    }
-  }
-
-  var columns = Object.keys(formatters);
-  var columns_s = columns.length;
-  original = original.map(function (row) {
-    for (var i = 0; i < columns_s; i++) {
-      var col = columns[i], new_val;
-
-      if (row.hasOwnProperty(col)) {
-        try {
-          new_val = mapRow(row[col], formatters[col]);
-        } catch (e) {
-          console.log(e.message, e.stack);
-          new_val = row[col];
-        }
-        row[col] = new_val;
-      }
-    }
-    return row;
-  });
-
-  return original;
-};
-
 function forEach(obj, callback, ctx) {
   if (!obj) {
     return;

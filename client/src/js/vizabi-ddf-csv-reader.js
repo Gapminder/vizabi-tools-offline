@@ -13,7 +13,6 @@ Vizabi.Reader.extend('ddfcsv', {
     this._name = 'ddf-csv';
     this._data = [];
     this._ddfPath = reader_info.ddfPath;
-    this._formatters = reader_info.formatters;
   },
 
   /**
@@ -40,9 +39,7 @@ Vizabi.Reader.extend('ddfcsv', {
       });
     }
 
-    if (_this.queryDescriptor.type === ddfUtils.MEASURES_TIME_PERIOD ||
-      _this.queryDescriptor.type === ddfUtils.MEASURES_TIME_FIXED) {
-
+    if (_this.queryDescriptor.type === ddfUtils.MEASURES_TIME) {
       return new Promise(function (resolve) {
         ddfUtils.getIndex(_this._ddfPath).then(function () {
           Promise
@@ -51,24 +48,20 @@ Vizabi.Reader.extend('ddfcsv', {
               var result = [];
               var geo = ddfUtils.CACHE.DATA_CACHED['geo-' + _this.queryDescriptor.category];
 
-              var d1 = (new Date(_this.queryDescriptor.timeFrom)).getFullYear();
-              var d2 = (new Date(_this.queryDescriptor.timeTo)).getFullYear();
-
-              for (var year = d1; year <= d2; year++) {
-
+              _this.queryDescriptor.timeRanges.forEach(function (time) {
                 for (var geoIndex = 0; geoIndex < geo.length; geoIndex++) {
                   var line = {
                     'geo': geo[geoIndex].geo,
-                    'time': year + ''
+                    'time': new Date(time)
                   };
 
-                  if (_this.injectMeasureValues(query, line, geoIndex, year) === true) {
+                  if (_this.injectMeasureValues(query, line, geoIndex, time) === true) {
                     result.push(line);
                   }
                 }
-              }
+              });
 
-              _this._data = utils.mapRows(result, _this._formatters);
+              _this._data = result;
 
               console.log('!QUERY', JSON.stringify(query));
               console.log('!OUT DATA', _this._data);
@@ -89,7 +82,7 @@ Vizabi.Reader.extend('ddfcsv', {
     return this._data;
   },
 
-  injectMeasureValues: function (query, line, geoIndex, year) {
+  injectMeasureValues: function (query, line, geoIndex, time) {
     var f = 0;
     var measures = this.getMeasuresNames(query);
     var geo = ddfUtils.CACHE.DATA_CACHED['geo-' + this.queryDescriptor.category];
@@ -98,9 +91,9 @@ Vizabi.Reader.extend('ddfcsv', {
       var measureCache = ddfUtils.CACHE.FILE_CACHED[ddfUtils.CACHE.measureFileToName[m]];
 
       if (measureCache && measureCache[geo[geoIndex].geo]) {
-        if (measureCache[geo[geoIndex].geo] && measureCache[geo[geoIndex].geo][year + ''] &&
-          measureCache[geo[geoIndex].geo][year + ''][m]) {
-          line[m] = Number(measureCache[geo[geoIndex].geo][year + ''][m]);
+        if (measureCache[geo[geoIndex].geo] && measureCache[geo[geoIndex].geo][time] &&
+          measureCache[geo[geoIndex].geo][time][m]) {
+          line[m] = Number(measureCache[geo[geoIndex].geo][time][m]);
           f++;
         }
       }

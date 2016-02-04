@@ -1,6 +1,6 @@
 {
   "name": "GapminderToolsPage",
-  "version": "0.8.3",
+  "version": "0.12.5",
   "description": "Gapminder Tools Page",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "compression-webpack-plugin": "0.2.0",
     "css-loader": "0.20.2",
     "extract-text-webpack-plugin": "0.8.2",
-    "file-loader": "^0.8.4",
+    "file-loader": "0.8.4",
     "html-loader": "0.3.0",
     "html-webpack-plugin": "1.6.1",
     "image-webpack-loader": "1.6.2",
@@ -40,13 +40,13 @@
     "angular": "1.4.7",
     "angular-route": "1.4.7",
     "angular-touch": "1.4.7",
-    "async": "^1.5.0",
+    "async": "1.5.0",
     "body-parser": "1.14.1",
     "bourbon": "4.2.6",
     "compression": "1.6.0",
     "connect-gzip-static": "1.0.0",
     "d3": "3.5.6",
-    "electron-prebuilt": "^0.34.1",
+    "electron-prebuilt": "0.34.1",
     "express": "4.13.3",
     "express-redis-cache": "0.1.8",
     "lodash": "3.10.1",
@@ -55,6 +55,6 @@
     "morgan": "1.6.1",
     "node-bourbon": "4.2.3",
     "redis": "2.2.5",
-    "vizabi": "0.12.2"
+    "vizabi": "0.12.5-2"
   }
 }
