@@ -46,7 +46,7 @@ Vizabi.Reader.extend('ddfcsv', {
             .all(_this.getExpectedMeasures(query))
             .then(function () {
               var result = [];
-              var geo = ddfUtils.CACHE.DATA_CACHED['geo-' + _this.queryDescriptor.category];
+              var geo = ddfUtils.CACHE.DATA_CACHED['geo-' + _this.queryDescriptor.cat];
 
               _this.queryDescriptor.timeRanges.forEach(function (time) {
                 for (var geoIndex = 0; geoIndex < geo.length; geoIndex++) {
@@ -85,7 +85,7 @@ Vizabi.Reader.extend('ddfcsv', {
   injectMeasureValues: function (query, line, geoIndex, time) {
     var f = 0;
     var measures = this.getMeasuresNames(query);
-    var geo = ddfUtils.CACHE.DATA_CACHED['geo-' + this.queryDescriptor.category];
+    var geo = ddfUtils.CACHE.DATA_CACHED['geo-' + this.queryDescriptor.cat];
 
     measures.forEach(function (m) {
       var measureCache = ddfUtils.CACHE.FILE_CACHED[ddfUtils.CACHE.measureFileToName[m]];
@@ -113,23 +113,22 @@ Vizabi.Reader.extend('ddfcsv', {
   },
 
   getGeoData: function (queryDescriptor) {
-    var adapters = {
-      country: function (geoRecord) {
-        return {
-          geo: geoRecord.geo,
-          'geo.name': geoRecord.name,
-          'geo.cat': queryDescriptor.category,
-          'geo.region': geoRecord.world_4region,
-          'geo.latitude': geoRecord.latitude,
-          'geo.longitude': geoRecord.longitude
+    function adapter(geoRecord) {
+      var r = {
+        'geo.cat': queryDescriptor.cat
+      };
+      for (var key in geoRecord) {
+        if (geoRecord.hasOwnProperty(key)) {
+          r[(key === 'geo' ? '' : 'geo.') + key] = geoRecord[key];
         }
       }
-    };
+      return r;
+    }
 
     var expectedGeoData = null;
     for (var k in ddfUtils.CACHE.FILE_CACHED) {
       if (ddfUtils.CACHE.FILE_CACHED.hasOwnProperty(k) &&
-        k.indexOf('ddf--list--geo--' + queryDescriptor.category) >= 0) {
+        k.indexOf('ddf--list--geo--' + queryDescriptor.cat) >= 0) {
         expectedGeoData = ddfUtils.CACHE.FILE_CACHED[k];
         break;
       }
@@ -138,11 +137,11 @@ Vizabi.Reader.extend('ddfcsv', {
     var result = [];
     if (expectedGeoData !== null) {
       expectedGeoData.forEach(function (d) {
-        result.push(adapters[queryDescriptor.category](d));
+        result.push(adapter(d));
       });
     }
 
-    ddfUtils.CACHE.DATA_CACHED['geo-' + queryDescriptor.category] = result;
+    ddfUtils.CACHE.DATA_CACHED['geo-' + queryDescriptor.cat] = result;
     return result;
   },
 

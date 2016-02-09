@@ -35,8 +35,13 @@
     <label ng-if="mode==='ddf'">DDF data URL<input type="text" ng-model="ddf.url"></label>
     <input type="button" ng-if="mode==='ddf'" ng-click="loadDdf()" value="Load" />
 
-    <span>List of favorites:</span>
-    <select ng-if="mode==='default'" ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
+    <br ng-if="mode==='ddf'">
+
+    <label ng-if="mode==='ddf'">Chart Geo<input type="text" ng-model="ddf.geoChart"></label>
+    <label ng-if="mode==='ddf'">Colors Geo<input type="text" ng-model="ddf.geoColors"></label>
+
+    <span ng-if="mode!=='ddf'">List of favorites:</span>
+    <select ng-if="mode!=='ddf'" ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
       <option value="">choose graph</option>
       <option ng-repeat="graph in favorites">{{graph.name}}</option>
     </select>
@@ -80,6 +85,14 @@
             <option ng-repeat="axis in ddf.measures" value="{{axis.measure}}">{{axis.name}}</option>
           </select>
         </div>
+      </div>
+      <div class="popup-block">
+        Current time:
+        <input type="text" ng-model="ddf.currentTime">
+      </div>
+      <div class="popup-block">
+        End time:
+        <input type="text" ng-model="ddf.endTime">
       </div>
       <div class="popup-footer">
         <input type="button"

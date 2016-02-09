@@ -26,12 +26,12 @@ function QueryDescriptor(query) {
 
   if (query.select.indexOf('geo.name') >= 0 || query.select.indexOf('geo.region') >= 0) {
     this.type = GEO;
-    this.category = this.geoCat[0];
+    this.cat = this.geoCat[0];
   }
 
   if (!result && query.where && query.where.time) {
     this.type = MEASURES_TIME;
-    this.category = this.geoCat[0];
+    this.cat = this.geoCat[0];
     this.timeRanges = ddfTimeUtils.getRange(query.where.time);
   }
 }
@@ -170,6 +170,10 @@ function getDimensions(ddfPath, cb) {
   return load(getDimensionEntryPoint(ddfPath), cb);
 }
 
+function getData(ddfUrl, nick1, nick2, cb) {
+  return load(ddfUrl + '/ddf--list--' + nick1 + '--' + nick2 + '.csv', cb);
+}
+
 exports.QueryDescriptor = QueryDescriptor;
 exports.geoProcessing = geoProcessing;
 exports.getIndexEntryPoint = getIndexEntryPoint;
@@ -178,4 +182,5 @@ exports.getMeasuresEntryPoint = getMeasuresEntryPoint;
 exports.getMeasures = getMeasures;
 exports.getDimensionEntryPoint = getDimensionEntryPoint;
 exports.getDimensions = getDimensions;
+exports.getData = getData;
 exports.load = load;

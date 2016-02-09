@@ -15,8 +15,8 @@ exports.queryTemplate = {
     state: {
       time: {
         start: "1800",
-        end: "2015",
-        value: "2015",
+        end: "", //
+        value: "", //
         step: 1,
         formatInput: "%Y",
         trails: true,
@@ -26,7 +26,7 @@ exports.queryTemplate = {
       entities: {
         dim: "geo",
         show: {
-          "geo.cat": ["country"]
+          "geo.cat": [] //
         }
       },
       marker: {
@@ -55,16 +55,12 @@ exports.queryTemplate = {
         },
         color: {
           use: "property",
-          which: "geo.region",
+          which: "", //
           scaleType: "ordinal",
           allow: {
             names: ["!geo.name"]
           },
-          palette: {
-            asia: "#FF5872",
-            europe: "#FFE700",
-            americas: "#7FEB00",
-            africa: "#00D5E9",
+          palette: { //
             _default: "#ffb600"
           }
         },
@@ -110,7 +106,7 @@ exports.queryTemplate = {
         opacityRegular: .6,
         show: {
           "geo": ["*"],
-          "geo.cat": ["country", "unstate"]
+          "geo.cat": [] //
         }
       },
       marker: {
@@ -141,7 +137,7 @@ exports.queryTemplate = {
         },
         color: {
           use: "property",
-          which: "geo.region",
+          which: "", //
           scaleType: "ordinal",
           allow: {
             names: ["!geo.name"]
@@ -153,7 +149,7 @@ exports.queryTemplate = {
         },
         group: {
           use: "property",
-          which: "geo.region", // set a property of data
+          which: "geo.world4_region", // set a property of data
           manualSorting: ["asia", "africa", "americas", "europe"],
           merge: false
         }
@@ -185,7 +181,7 @@ exports.queryTemplate = {
         opacitySelectDim: .3,
         opacityRegular: 1,
         show: {
-          "geo.cat": ["country", "unstate"]
+          "geo.cat": [] //
         }
       },
       marker: {
@@ -214,7 +210,7 @@ exports.queryTemplate = {
         },
         color: {
           use: "property",
-          which: "geo.region",
+          which: "", //
           scaleType: "ordinal",
           allow: {
             names: ["!geo.name"]
