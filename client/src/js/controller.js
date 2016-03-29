@@ -17,6 +17,28 @@ function safeApply(scope, fn) {
   }
 }
 
+function getRandomColor() {
+  var letters = '0123456789ABCDEF'.split('');
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+function getColorized(what, index) {
+  var options = ['#ff5872', '#ffe700', '#7feb00', '#00d5e9', '#ffb600', '#ff5178', '#fbdd00',
+    '#5de200', '#00c8ec', '#ffaa14', '#ff658a', '#fff400', '#81f201', '#00e1ec', '#ffc500',
+    '#da0025', '#fbaf09', '#00b900', '#0098df', '#fb6d19', '#fa4e73', '#ffe700', '#b5ea32',
+    '#77dff7', '#ffb600', '#b2043a', '#b17f4a', '#008d36', '#0586c6', '#9b4838'
+  ];
+  var color = index < options.length ? options[index] : getRandomColor();
+  return {
+    key: what,
+    value: color
+  };
+}
+
 module.exports = function (app) {
   app
     .controller('gapminderToolsCtrl', [
@@ -85,6 +107,7 @@ module.exports = function (app) {
         $scope.mode = 'default';
         $scope.ddf = {
           url: 'https://raw.githubusercontent.com/valor-software/ddf--gapminder--systema_globalis/master',
+          // url: 'http://localhost:2000/ddf--sodertornsmodellen--testing2016',
           type: 'BubbleChart',
           types: [
             {value: 'BubbleChart', name: 'Bubble Chart'},
@@ -96,7 +119,14 @@ module.exports = function (app) {
           popup: false,
           xAxis: '',
           yAxis: '',
-          sizeAxis: ''
+          sizeAxis: '',
+          geoChart: 'geo.country',
+          geoColors: 'geo.world_4region',
+          // geoChart: 'geo.basomrade',
+          // geoColors: 'geo.kommun',
+          colorized: {},
+          currentTime: '2012',
+          endTime: '2017'
         };
 
         $scope.loadingError = false;
@@ -148,11 +178,26 @@ module.exports = function (app) {
                 return;
               }
 
-              safeApply($scope, function () {
-                $scope.ddf.measures = result.filter(function (v) {
-                  return !!v.measure;
+              $scope.ddf.measures = result.filter(function (v) {
+                return !!v.measure;
+              });
+
+              var s = $scope.ddf.geoColors.split('.');
+              ddfUtils.getData($scope.ddf.url, s[0], s[1], function (err, result) {
+                if (err) {
+                  console.log(err);
+                  return;
+                }
+
+                safeApply($scope, function () {
+                  $scope.ddf.colorized = {};
+                  result.forEach(function (r, i) {
+                    var c = getColorized(r[s[0]], i);
+                    $scope.ddf.colorized[c.key] = c.value;
+                  });
+                  $scope.ddf.colorized['_default'] = "#ffb600";
+                  $scope.ddf.popup = true;
                 });
-                $scope.ddf.popup = true;
               });
             });
           });
@@ -181,6 +226,13 @@ module.exports = function (app) {
             if ($scope.ddf.type === 'BubbleMap') {
               queryObj.state.marker.size.which = $scope.ddf.sizeAxis;
             }
+
+            var s = $scope.ddf.geoChart.split('.');
+            queryObj.state.entities.show['geo.cat'] = [s[1]];
+            queryObj.state.marker.color.palette = $scope.ddf.colorized;
+            queryObj.state.marker.color.which = $scope.ddf.geoColors;
+            queryObj.state.time.end = $scope.ddf.endTime;
+            queryObj.state.time.value = $scope.ddf.currentTime;
 
             $scope.ddf.dimensions.forEach(function (dimension) {
               var name = dimension.type === 'dimension' ?
@@ -221,6 +273,39 @@ module.exports = function (app) {
               sourceLink: ''
             };
 
+            var colorContains = [
+              {
+                obj: metadataTemplate.color.shades,
+                content: {
+                  "fill1": 0,
+                  "fill2": 1,
+                  "fill3": 2,
+                  "shade": 3,
+                  "print_fill": 4,
+                  "print_stroke": 5,
+                  "_default": 0
+                }
+              },
+              {
+                obj: metadataTemplate.color.selectable,
+                content: false
+              },
+              {
+                obj: metadataTemplate.indicatorsDB,
+                content: {
+                  "allowCharts": ["*"],
+                  "use": "property",
+                  "unit": "",
+                  "scales": ["ordinal"],
+                  "sourceLink": ""
+                }
+              }
+            ];
+            colorContains.forEach(function (o) {
+              o.obj[$scope.ddf.geoColors] = o.content;
+            });
+            metadataTemplate.indicatorsTree.children[1].children.push({id: $scope.ddf.geoColors});
+            metadataTemplate.color.palettes[$scope.ddf.geoColors] = $scope.ddf.colorized;
             $scope.ddf.popup = false;
 
             Vizabi.Tool.define('preload', function (promise) {
@@ -231,6 +316,7 @@ module.exports = function (app) {
             });
 
             queryObj.data.ddfPath = $scope.ddf.url;
+
             vizabiFactory.render($scope.ddf.type, placeholder, queryObj);
           }, 0);
         };
