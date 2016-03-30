@@ -2,10 +2,9 @@ var Vizabi = require('vizabi');
 var async = require('async');
 var _ = require('lodash');
 
-var ddfUtils = require('./vizabi-ddf-utils');
+var ddfLib = require('./vizabi-ddf');
+var Ddf = ddfLib.Ddf;
 var queryTemplate = require('./templates/query').queryTemplate;
-var metadataTemplate = require('./templates/metadata').metadataTemplate;
-var translationsTemplate = require('./templates/translations').translationsTemplate;
 var queryForCsvReader = require('./templates/query-for-csv-reader').queryForCsvReader;
 
 function safeApply(scope, fn) {
@@ -15,28 +14,6 @@ function safeApply(scope, fn) {
   } else {
     scope.$apply(fn);
   }
-}
-
-function getRandomColor() {
-  var letters = '0123456789ABCDEF'.split('');
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
-
-function getColorized(what, index) {
-  var options = ['#ff5872', '#ffe700', '#7feb00', '#00d5e9', '#ffb600', '#ff5178', '#fbdd00',
-    '#5de200', '#00c8ec', '#ffaa14', '#ff658a', '#fff400', '#81f201', '#00e1ec', '#ffc500',
-    '#da0025', '#fbaf09', '#00b900', '#0098df', '#fb6d19', '#fa4e73', '#ffe700', '#b5ea32',
-    '#77dff7', '#ffb600', '#b2043a', '#b17f4a', '#008d36', '#0586c6', '#9b4838'
-  ];
-  var color = index < options.length ? options[index] : getRandomColor();
-  return {
-    key: what,
-    value: color
-  };
 }
 
 module.exports = function (app) {
@@ -92,22 +69,23 @@ module.exports = function (app) {
                 }
                 Vizabi._globals.metadata = JSON.parse(results[0]);
                 vizabiContext.model.language.strings.set(vizabiContext.model.language.id, JSON.parse(results[1]));
-                //set indicators
-                Vizabi._globals.metadata.indicatorsArray = ["gini", "gdp_per_cap", "u5mr"];
                 promise.resolve();
               });
             return promise;
           });
         }
 
+        var metadataContent = '';
+        var translationsContent = '';
+
         //last tab created
         $scope.lastTab = -1;
         $scope.tabs = [];
 
-        $scope.mode = 'default';
         $scope.ddf = {
-          url: 'https://raw.githubusercontent.com/valor-software/ddf--gapminder--systema_globalis/master',
-          // url: 'http://localhost:2000/ddf--sodertornsmodellen--testing2016',
+          url: 'https://raw.githubusercontent.com/buchslava/ddf--gapminder_world/master/output/ddf/',
+          metadataUrl: 'https://raw.githubusercontent.com/semio/ddf--gapminder_world/master/output/vizabi/metadata.json',
+          translationsUrl: 'https://raw.githubusercontent.com/semio/ddf--gapminder_world/master/output/vizabi/en.json',
           type: 'BubbleChart',
           types: [
             {value: 'BubbleChart', name: 'Bubble Chart'},
@@ -117,16 +95,21 @@ module.exports = function (app) {
           measures: [],
           dimensions: [],
           popup: false,
+          /*xAxis: 'gdppercapita_us_inflation_adjusted',
+           yAxis: 'life_expectancy_at_birth_data_from_ihme',
+           sizeAxis: 'population_total',
+           xAxis: 'sg_gdp_p_cap_const_ppp2011_dollar',
+           yAxis: 'sg_population',
+           sizeAxis: 'sg_gini',*/
           xAxis: '',
           yAxis: '',
           sizeAxis: '',
           geoChart: 'geo.country',
-          geoColors: 'geo.world_4region',
-          // geoChart: 'geo.basomrade',
-          // geoColors: 'geo.kommun',
+          geoColors: 'geo.geographic_regions_in_4_colors',
           colorized: {},
-          currentTime: '2012',
-          endTime: '2017'
+          startTime: "1990",
+          currentTime: '2009',
+          endTime: '2015'
         };
 
         $scope.loadingError = false;
@@ -164,39 +147,36 @@ module.exports = function (app) {
         };
 
         $scope.loadDdf = function () {
-          ddfUtils.getDimensions($scope.ddf.url, function (err, result) {
-            if (err) {
-              console.log(err);
-              return;
-            }
+          var query = {
+            "select": ["geo", "geo.name", "geo.geographic_regions_in_4_colors"],
+            "where": {"geo.is--country": true},
+            "grouping": {},
+            "orderBy": null
+          };
+          var ddf = new Ddf($scope.ddf.url);
+          ddf.getIndex(function () {
+            ddf.getConceptsAndEntities(query, function (concepts, entities) {
+              $scope.ddf.dimensions = [];
+              $scope.ddf.measures = [];
 
-            $scope.ddf.dimensions = result;
-
-            ddfUtils.getMeasures($scope.ddf.url, function (err, result) {
-              if (err) {
-                console.log(err);
-                return;
-              }
-
-              $scope.ddf.measures = result.filter(function (v) {
-                return !!v.measure;
-              });
-
-              var s = $scope.ddf.geoColors.split('.');
-              ddfUtils.getData($scope.ddf.url, s[0], s[1], function (err, result) {
-                if (err) {
-                  console.log(err);
-                  return;
+              concepts.forEach(function (concept) {
+                if (concept.concept_type === 'measure') {
+                  $scope.ddf.measures.push(concept);
                 }
 
-                safeApply($scope, function () {
-                  $scope.ddf.colorized = {};
-                  result.forEach(function (r, i) {
-                    var c = getColorized(r[s[0]], i);
-                    $scope.ddf.colorized[c.key] = c.value;
+                if (concept.concept_type !== 'measure') {
+                  $scope.ddf.dimensions.push(concept);
+                }
+              });
+
+              xhrLoad($scope.ddf.metadataUrl, function (metadata) {
+                xhrLoad($scope.ddf.translationsUrl, function (translations) {
+                  metadataContent = JSON.parse(metadata);
+                  translationsContent = JSON.parse(translations);
+
+                  safeApply($scope, function () {
+                    $scope.ddf.popup = true;
                   });
-                  $scope.ddf.colorized['_default'] = "#ffb600";
-                  $scope.ddf.popup = true;
                 });
               });
             });
@@ -206,6 +186,19 @@ module.exports = function (app) {
         $scope.closeDdf = function () {
           $scope.ddf.popup = false;
         };
+
+        function xhrLoad(path, cb) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', path, true);
+          xhr.onload = function () {
+            if (xhr.readyState === 4) {
+              if (xhr.status === 200) {
+                cb(xhr.responseText);
+              }
+            }
+          };
+          xhr.send(null);
+        }
 
         $scope.openDdf = function () {
           var queryObj = queryTemplate[$scope.ddf.type];
@@ -224,99 +217,24 @@ module.exports = function (app) {
             }
 
             if ($scope.ddf.type === 'BubbleMap') {
+              queryObj.data.path = $scope.ddf.url;
               queryObj.state.marker.size.which = $scope.ddf.sizeAxis;
             }
 
-            var s = $scope.ddf.geoChart.split('.');
-            queryObj.state.entities.show['geo.cat'] = [s[1]];
-            queryObj.state.marker.color.palette = $scope.ddf.colorized;
             queryObj.state.marker.color.which = $scope.ddf.geoColors;
+            queryObj.state.time.start = $scope.ddf.startTime;
             queryObj.state.time.end = $scope.ddf.endTime;
             queryObj.state.time.value = $scope.ddf.currentTime;
 
-            $scope.ddf.dimensions.forEach(function (dimension) {
-              var name = dimension.type === 'dimension' ?
-                dimension.concept : dimension.subdim_of + '.' + dimension.concept;
-              metadataTemplate.indicatorsDB[name] = {
-                allowCharts: ['*'],
-                use: 'property',
-                unit: '',
-                scales: ['ordinal'],
-                sourceLink: dimension.link || ''
-              };
-            });
-
-            var measuresPlain = [];
-            $scope.ddf.measures.forEach(function (measure) {
-              measuresPlain.push(measure.measure);
-              metadataTemplate.indicatorsDB[measure.measure] = {
-                allowCharts: ['mountainchart', 'bubblechart', 'bubblemap'],
-                use: 'indicator',
-                unit: measure.unit,
-                scales: ['linear'],
-                sourceLink: ''
-              };
-              // todo: temporary solution: consider real
-              metadataTemplate.indicatorsTree.children[2].children.push({
-                id: measure.measure
-              });
-
-              translationsTemplate['indicator/' + measure.measure] = measure.name;
-              translationsTemplate['unit/' + measure.unit] = measure.unit;
-            });
-
-            metadataTemplate.indicatorsDB._default = {
-              allowCharts: ['*'],
-              use: 'constant',
-              unit: '',
-              scales: ['ordinal'],
-              sourceLink: ''
-            };
-
-            var colorContains = [
-              {
-                obj: metadataTemplate.color.shades,
-                content: {
-                  "fill1": 0,
-                  "fill2": 1,
-                  "fill3": 2,
-                  "shade": 3,
-                  "print_fill": 4,
-                  "print_stroke": 5,
-                  "_default": 0
-                }
-              },
-              {
-                obj: metadataTemplate.color.selectable,
-                content: false
-              },
-              {
-                obj: metadataTemplate.indicatorsDB,
-                content: {
-                  "allowCharts": ["*"],
-                  "use": "property",
-                  "unit": "",
-                  "scales": ["ordinal"],
-                  "sourceLink": ""
-                }
-              }
-            ];
-            colorContains.forEach(function (o) {
-              o.obj[$scope.ddf.geoColors] = o.content;
-            });
-            metadataTemplate.indicatorsTree.children[1].children.push({id: $scope.ddf.geoColors});
-            metadataTemplate.color.palettes[$scope.ddf.geoColors] = $scope.ddf.colorized;
             $scope.ddf.popup = false;
 
             Vizabi.Tool.define('preload', function (promise) {
-              Vizabi._globals.metadata = metadataTemplate;
-              Vizabi._globals.metadata.indicatorsArray = measuresPlain;
-              this.model.language.strings.set(this.model.language.id, translationsTemplate);
+              Vizabi._globals.metadata = metadataContent;
+              this.model.language.strings.set(this.model.language.id, translationsContent);
               promise.resolve();
             });
 
             queryObj.data.ddfPath = $scope.ddf.url;
-
             vizabiFactory.render($scope.ddf.type, placeholder, queryObj);
           }, 0);
         };

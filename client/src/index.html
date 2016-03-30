@@ -19,29 +19,15 @@
     </a>
     <button ng-click="newTab()">new tab</button>
 
-    <label><input type="radio" ng-model="mode" value="default">default</label>
-    <label><input type="radio" ng-model="mode" value="ddf">ddf</label>&nbsp;&nbsp;
+    <input type="button" ng-click="ddf.popup = true" value="DDF" />
 
-    <select ng-if="mode==='default'" ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
+    <select ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
       <option value="">choose graph</option>
       <option ng-repeat="graph in graphs">{{graph.name}}</option>
     </select>
 
-    <select ng-if="mode==='ddf'" ng-model="ddf.type">
-      <option value="">choose graph type</option>
-      <option ng-repeat="type in ddf.types" value="{{type.value}}">{{type.name}}</option>
-    </select>
-
-    <label ng-if="mode==='ddf'">DDF data URL<input type="text" ng-model="ddf.url"></label>
-    <input type="button" ng-if="mode==='ddf'" ng-click="loadDdf()" value="Load" />
-
-    <br ng-if="mode==='ddf'">
-
-    <label ng-if="mode==='ddf'">Chart Geo<input type="text" ng-model="ddf.geoChart"></label>
-    <label ng-if="mode==='ddf'">Colors Geo<input type="text" ng-model="ddf.geoColors"></label>
-
-    <span ng-if="mode!=='ddf'">List of favorites:</span>
-    <select ng-if="mode!=='ddf'" ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
+    <span>List of favorites:</span>
+    <select ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
       <option value="">choose graph</option>
       <option ng-repeat="graph in favorites">{{graph.name}}</option>
     </select>
@@ -54,26 +40,50 @@
     </ul>
 
     <div class="pre-popup" ng-if="ddf.popup === true">
+
+      <div class="popup-block">
+        <select ng-model="ddf.type">
+          <option value="">choose graph type</option>
+          <option ng-repeat="type in ddf.types" value="{{type.value}}">{{type.name}}</option>
+        </select>
+      </div>
+
+      <div class="popup-block">
+        <label>DDF data URL<input type="text" ng-model="ddf.url" size="70"></label>
+      </div>
+
+      <div class="popup-block">
+        <label>DDF metadata data URL<input type="text" ng-model="ddf.metadataUrl" size="70"></label>
+      </div>
+
+      <div class="popup-block">
+        <label>DDF translations URL<input type="text" ng-model="ddf.translationsUrl" size="70"></label>
+      </div>
+
+      <div class="popup-block">
+        <input type="button" ng-click="loadDdf()" value="Load measures" />
+      </div>
+
       <div ng-if="ddf.type === 'BubbleChart' || ddf.type === 'MountainChart'">
         <div class="popup-block">
           X axis:
           <select ng-model="ddf.xAxis">
             <option value="">choose measure</option>
-            <option ng-repeat="axis in ddf.measures" value="{{axis.measure}}">{{axis.name}}</option>
+            <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
         <div class="popup-block">
           Y axis:
           <select ng-model="ddf.yAxis">
             <option value="">choose measure</option>
-            <option ng-repeat="axis in ddf.measures" value="{{axis.measure}}">{{axis.name}}</option>
+            <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
         <div class="popup-block">
           Size axis:
           <select ng-model="ddf.sizeAxis">
             <option value="">choose measure</option>
-            <option ng-repeat="axis in ddf.measures" value="{{axis.measure}}">{{axis.name}}</option>
+            <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
       </div>
@@ -82,9 +92,16 @@
           Size measure:
           <select ng-model="ddf.sizeAxis">
             <option value="">choose measure</option>
-            <option ng-repeat="axis in ddf.measures" value="{{axis.measure}}">{{axis.name}}</option>
+            <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
+      </div>
+      <div class="popup-block">
+        <label>Chart Geo<input type="text" ng-model="ddf.geoChart" size="30"></label>
+      </div>
+
+      <div class="popup-block">
+        <label>Colors Geo<input type="text" ng-model="ddf.geoColors" size="30"></label>
       </div>
       <div class="popup-block">
         Current time:

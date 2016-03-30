@@ -100,7 +100,7 @@ var baseConfig = {
       }
     ]
   },
-  stats: {colors: true, progress: true, children: false},
+  stats: {colors: true, progress: true, children: true},
   target: isElectronApp ? 'atom' : 'web'
 };
 
