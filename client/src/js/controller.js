@@ -36,45 +36,6 @@ module.exports = function (app) {
           });
         }
 
-        if (config.isElectronApp) {
-          console.log('is electron app');
-          var path = require('path');
-          var remote = require('remote');
-          var app = remote.require('app');
-          var electronPath = app.getAppPath();
-
-          Vizabi._globals.gapminder_paths.baseUrl = path.join(electronPath, 'client/dist/tools/public/fixtures/');
-
-          Vizabi.Tool.define("preload", function (promise) {
-            console.log('preload start');
-            var vizabiContext = this;
-            async.parallel([
-                function (callback) {
-                  readerService.getFile({
-                    path: path.join(electronPath, 'client/dist/tools/public/fixtures/waffles/metadata.json'),
-                    type: 'json'
-                  }, callback);
-                },
-                function (callback) {
-                  readerService.getFile({
-                    path: path.join(electronPath, 'client/src/public/fixtures/translation/en.json'),
-                    type: 'json'
-                  }, callback);
-                }
-              ],
-              function (err, results) {
-                // the results array will equal ['one','two'] even though
-                if (err) {
-                  return console.log('load vizabi config files failed');
-                }
-                Vizabi._globals.metadata = JSON.parse(results[0]);
-                vizabiContext.model.language.strings.set(vizabiContext.model.language.id, JSON.parse(results[1]));
-                promise.resolve();
-              });
-            return promise;
-          });
-        }
-
         var metadataContent = '';
         var translationsContent = '';
 

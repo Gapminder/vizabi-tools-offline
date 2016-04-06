@@ -11,19 +11,19 @@ var CompressionPlugin = require('compression-webpack-plugin');
 var bourbon = require('node-bourbon').includePaths;
 var _ = require('lodash');
 
+var isProduction = process.env.NODE_ENV === 'production';
+var isElectronApp = process.env.IS_ELECTRON_APP;
+
 var config = {
   template: 'index.html',
   index: 'index.html',
   src: './client/src',
   dest: './client/dist/tools',
-  publicPath: '/tools/'
+  publicPath: isElectronApp ? path.join(__dirname, '/client/dist/tools/') : '/tools/'
 };
 
 var chromeAppPaths = _.clone(config);
 chromeAppPaths.dest = './chrome-app/tools';
-
-var isProduction = process.env.NODE_ENV === 'production';
-var isElectronApp = process.env.IS_ELECTRON_APP;
 
 var absSrc = path.join(__dirname, config.src);
 var absDest = path.join(__dirname, config.dest);

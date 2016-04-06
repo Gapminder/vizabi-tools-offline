@@ -67,21 +67,21 @@
       <div ng-if="ddf.type === 'BubbleChart' || ddf.type === 'MountainChart'">
         <div class="popup-block">
           X axis:
-          <select ng-model="ddf.xAxis">
+          <select ng-model="ddf.xAxis" ng-disabled="ddf.measures.length < 1">
             <option value="">choose measure</option>
             <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
         <div class="popup-block">
           Y axis:
-          <select ng-model="ddf.yAxis">
+          <select ng-model="ddf.yAxis" ng-disabled="ddf.measures.length < 1">
             <option value="">choose measure</option>
             <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
         <div class="popup-block">
           Size axis:
-          <select ng-model="ddf.sizeAxis">
+          <select ng-model="ddf.sizeAxis" ng-disabled="ddf.measures.length < 1">
             <option value="">choose measure</option>
             <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
@@ -90,7 +90,7 @@
       <div ng-if="ddf.type === 'BubbleMap'">
         <div class="popup-block">
           Size measure:
-          <select ng-model="ddf.sizeAxis">
+          <select ng-model="ddf.sizeAxis" ng-disabled="ddf.measures.length > 1">
             <option value="">choose measure</option>
             <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>

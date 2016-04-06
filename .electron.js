@@ -1,6 +1,3 @@
-var DEFAULT_LOAD_URL =  (process.env.HOST_URL || 'http://localhost') + ':' + (process.env.PORT || 3001);
-var LOAD_URL =  process.env.LOAD_URL ? process.env.LOAD_URL : DEFAULT_LOAD_URL;
-
 var app = require('app');  // Module to control application life.
 //var ipc = require('ipc');
 var BrowserWindow = require('browser-window');  // Module to create native browser window.
@@ -25,7 +22,7 @@ app.on('ready', function() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1200,
-    height: 600,
+    height: 800,
     'min-width': 800,
     'min-height': 200,
     'accept-first-mouse': true,

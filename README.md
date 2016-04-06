@@ -17,14 +17,13 @@
   * click `Load unpacked extension…` to pop up a file-selection dialog.
   * Navigate to the directory in which your the unzipped files live, and select it(edited)
 
-### How to run the Electron app for development
-
-  * `npm run electron-dev`
-
 ### How to build the Electron app
 
   * install `electron-packager`
-  * `npm run build`
-  * `electron-packager PATH_TO_SRC tools-vizabi --platform=all  --arch=x64 --version=0.34.1`
+  * `npm run electron`
+  * `electron-packager . tools-vizabi --platform=all  --arch=x64 --version=0.37.5 --overwrite`
 
+### How to run the Electron app for development
 
+  * change directory to expected: tools-vizabi-x; for example `tools-vizabi-win32-x64` for windows
+  * run `tools-vizabi` for linux or `tools-vizabi.exe` for windows
