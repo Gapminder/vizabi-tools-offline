@@ -41,12 +41,49 @@ Ddf.prototype.getConceptFileNames = function () {
   return utils.unique(result);
 };
 
-Ddf.prototype.getEntityFileNames = function () {
+function getSelectParts(query) {
+  return query.select.map(function (selectPart) {
+    var pos = selectPart.indexOf('.');
+
+    return pos >= 0 ? selectPart.substr(pos + 1) : selectPart;
+  });
+}
+
+function getWhereParts(query) {
+  var whereParts = [];
+
+  for (var whereKey in query.where) {
+    if (query.where.hasOwnProperty(whereKey)) {
+      var pos = whereKey.indexOf('.');
+      var value = pos >= 0 ? whereKey.substr(pos + 1) : whereKey;
+
+      value = value.replace(/is--/, '');
+      whereParts.push(value);
+    }
+  }
+
+  return whereParts;
+}
+
+Ddf.prototype.getEntitySetsByQuery = function (query) {
+  var selectPartsEntitySets = getSelectParts(query).filter(function (part) {
+    return conceptTypeHash[part] === 'entity_set';
+  });
+
+  var wherePartsEntitySets = getWhereParts(query).filter(function (part) {
+    return conceptTypeHash[part] === 'entity_set';
+  });
+
+  return wherePartsEntitySets.length > 0 ? wherePartsEntitySets : selectPartsEntitySets;
+};
+
+Ddf.prototype.getEntityFileNames = function (query) {
   var _this = this;
   var result = [];
+  var expectedEntities = this.getEntitySetsByQuery(query);
 
   index.forEach(function (indexRecord) {
-    if (conceptTypeHash[indexRecord.key] === 'entity_domain' || conceptTypeHash[indexRecord.key] === 'entity_set') {
+    if (expectedEntities.indexOf(indexRecord.key) >= 0) {
       result.push(_this.ddfPath + indexRecord.file);
     }
   });
@@ -166,7 +203,7 @@ Ddf.prototype.normalizeAndFilter = function (headerDescriptor, content, filter) 
 Ddf.prototype.getEntities = function (query, cb) {
   var _this = this;
   var entityActions = [];
-  var entityFileNames = _this.getEntityFileNames();
+  var entityFileNames = _this.getEntityFileNames(query);
 
   entityFileNames.forEach(function (fileName) {
     entityActions.push(load(fileName));
