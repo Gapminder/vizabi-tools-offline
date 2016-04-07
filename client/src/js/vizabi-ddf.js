@@ -9,6 +9,10 @@ var entities = null;
 function Ddf(ddfPath) {
   this.ddfPath = ddfPath;
 
+  if (this.ddfPath[this.ddfPath.length - 1] !== '/') {
+    this.ddfPath += '/';
+  }
+
   var parser = document.createElement('a');
   parser.href = ddfPath;
 }
@@ -30,7 +34,7 @@ Ddf.prototype.getConceptFileNames = function () {
 
   index.forEach(function (indexRecord) {
     if (indexRecord.key === 'concept') {
-      result.push(_this.ddfPath + '/' + indexRecord.file);
+      result.push(_this.ddfPath + indexRecord.file);
     }
   });
 
@@ -42,8 +46,8 @@ Ddf.prototype.getEntityFileNames = function () {
   var result = [];
 
   index.forEach(function (indexRecord) {
-    if (conceptTypeHash[indexRecord.key] === 'entity_domain') {
-      result.push(_this.ddfPath + '/' + indexRecord.file);
+    if (conceptTypeHash[indexRecord.key] === 'entity_domain' || conceptTypeHash[indexRecord.key] === 'entity_set') {
+      result.push(_this.ddfPath + indexRecord.file);
     }
   });
 
@@ -276,9 +280,9 @@ Ddf.prototype.getDataPointDescriptorsByIndex = function (query) {
         });
 
         if (founded === parts.length) {
-          fileNames.push(_this.ddfPath + '/' + indexRecord.file);
+          fileNames.push(_this.ddfPath + indexRecord.file);
           descriptors.push({
-            fileName: _this.ddfPath + '/' + indexRecord.file,
+            fileName: _this.ddfPath + indexRecord.file,
             measures: [indexRecord.value],
             // only one measure should be present in DDF1 data point in case of Vizabi using?
             measure: indexRecord.value,
