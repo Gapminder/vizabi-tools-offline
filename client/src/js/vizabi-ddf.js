@@ -18,6 +18,15 @@ function Ddf(ddfPath) {
   parser.href = ddfPath;
 }
 
+Ddf.reset = function () {
+  index = null;
+  concepts = null;
+  conceptTypeHash = {};
+  entities = null;
+  CACHE.FILE_CACHED = {};
+  CACHE.FILE_REQUESTED = {};
+};
+
 Ddf.prototype.getIndex = function (cb) {
   var indexFileName = this.ddfPath + 'ddf--index.csv';
   var indexAction = load(indexFileName);
@@ -25,7 +34,9 @@ Ddf.prototype.getIndex = function (cb) {
   indexAction.then(function () {
     index = CACHE.FILE_CACHED[indexFileName];
 
-    cb();
+    cb(null, index);
+  }, function (err) {
+    cb(err);
   });
 };
 
@@ -67,6 +78,10 @@ function getWhereParts(query) {
 }
 
 Ddf.prototype.getEntitySetsByQuery = function (query) {
+  if (!query || !query.select || !query.where) {
+    return 'Wrong entities query; it should contain "select" and "where" fields';
+  }
+
   var selectPartsEntitySets = getSelectParts(query).filter(function (part) {
     return conceptTypeHash[part] === 'entity_set';
   });
@@ -82,6 +97,10 @@ Ddf.prototype.getEntityFileNames = function (query) {
   var _this = this;
   var result = [];
   var expectedEntities = this.getEntitySetsByQuery(query);
+
+  if (typeof expectedEntities === 'string') {
+    return expectedEntities;
+  }
 
   index.forEach(function (indexRecord) {
     if (expectedEntities.indexOf(indexRecord.key) >= 0) {
@@ -206,6 +225,10 @@ Ddf.prototype.getEntities = function (query, cb) {
   var entityActions = [];
   var entityFileNames = _this.getEntityFileNames(query);
 
+  if (typeof entityFileNames === 'string') {
+    return cb(entityFileNames);
+  }
+
   entityFileNames.forEach(function (fileName) {
     entityActions.push(load(fileName));
   });
@@ -230,7 +253,9 @@ Ddf.prototype.getEntities = function (query, cb) {
       entities = _entities;
     }
 
-    cb(entities);
+    cb(null, entities);
+  }, function (err) {
+    cb(err);
   });
 };
 
@@ -264,16 +289,22 @@ Ddf.prototype.getConcepts = function (query, cb) {
       });
     }
 
-    cb(concepts);
+    cb(null, concepts);
+  }, function (err) {
+    cb(err);
   });
 };
 
 Ddf.prototype.getConceptsAndEntities = function (query, cb) {
   var _this = this;
 
-  _this.getConcepts(query, function (concepts) {
-    _this.getEntities(query, function (entities) {
-      cb(concepts, entities);
+  _this.getConcepts(query, function (err, concepts) {
+    if (err) {
+      return cb(err);
+    }
+
+    _this.getEntities(query, function (err, entities) {
+      cb(err, concepts, entities);
     });
   });
 };
@@ -362,6 +393,8 @@ Ddf.prototype.getDataPointsContent = function (query, cb) {
     });
 
     cb();
+  }, function (err) {
+    cb(err);
   });
 };
 
@@ -388,7 +421,11 @@ Ddf.prototype.getEntityDomainConcept = function () {
 Ddf.prototype.getDataPoints = function (query, cb) {
   var _this = this;
 
-  _this.getDataPointsContent(query, function () {
+  _this.getDataPointsContent(query, function (err) {
+    if (err) {
+      return cb(err);
+    }
+
     var entityDomainConcept = _this.getEntityDomainConcept();
     var timeConcept = _this.getTimeConcept();
 
@@ -436,7 +473,7 @@ Ddf.prototype.getDataPoints = function (query, cb) {
       });
     });
 
-    cb(result);
+    cb(err, result);
   });
 };
 
@@ -491,14 +528,32 @@ function load(path) {
   var loader = (EVALALLOWED) ? d3.csv : d3.text;
   var parser = (EVALALLOWED) ? null : csvToObject;
 
+  if (Ddf.chromeFs) {
+    loader = function (path, cb) {
+      Ddf.chromeFs.readFile(path, '', function (err, file) {
+        cb(err, file);
+      });
+    };
+    parser = csvToObject;
+  }
+
   loader(path, function (error, res) {
+    var reason;
 
     if (!res) {
-      console.log('No permissions or empty file: ' + path, error);
+      reason = 'No permissions or empty file: ' + path + ': ' + error.message;
+
+      CACHE.FILE_CACHED[path] = null;
+      CACHE.FILE_REQUESTED[path].reject(reason);
+      return;
     }
 
     if (error) {
-      console.log('Error Happened While Loading CSV File: ' + path, error);
+      reason = 'Error Happened While Loading CSV File: ' + path + ': ' + error.message;
+
+      CACHE.FILE_CACHED[path] = null;
+      CACHE.FILE_REQUESTED[path].reject(reason);
+      return;
     }
 
     if (parser) {

@@ -49,12 +49,14 @@
     "electron-prebuilt": "0.37.5",
     "express": "4.13.3",
     "express-redis-cache": "0.1.8",
+    "format-json": "1.0.3",
     "lodash": "3.10.1",
     "method-override": "2.3.5",
     "mongoose": "4.1.12",
     "morgan": "1.6.1",
     "node-bourbon": "4.2.3",
     "redis": "2.2.5",
-    "vizabi": "latest"
+    "vizabi": "latest",
+    "web-fs": "2.1.0"
   }
 }

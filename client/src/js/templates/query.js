@@ -1,4 +1,9 @@
-exports.queryTemplate = {
+exports.entitiesQueryTemplate = {
+  select: ["geo", "geo.name", "geo.geographic_regions_in_4_colors"],
+  where: {"geo.is--country": true}
+};
+
+exports.mainQueryTemplate = {
   BubbleChart: {
     state: {
       time: {
@@ -31,7 +36,7 @@ exports.queryTemplate = {
         },
         color: {
           use: "property",
-          which: "", //
+          which: "geo.geographic_regions_in_4_colors", //
           scaleType: "ordinal",
           allow: {names: ["!geo.name"]}
         },
@@ -129,7 +134,7 @@ exports.queryTemplate = {
         },
         color: {
           use: "property",
-          which: "", //
+          which: "geo.geographic_regions_in_4_colors",
           scaleType: "ordinal",
           allow: {
             names: ["!geo.name"]
@@ -200,7 +205,7 @@ exports.queryTemplate = {
         },
         color: {
           use: "property",
-          which: "", //
+          which: "geo.geographic_regions_in_4_colors",
           scaleType: "ordinal",
           allow: {
             names: ["!geo.name"]
