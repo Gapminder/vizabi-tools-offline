@@ -57,11 +57,7 @@ var baseConfig = {
         test: /vizabi\.js/,
         loader: 'imports?this=>window,d3'
       },
-      {
-        test: /\.scss/,
-        //loader: 'style!css!sass?includePaths[]=' + bourbon
-        loader: ExtractTextPlugin.extract('style-loader', 'css-loader?sourceMap&root=' + absSrc + '!sass-loader?includePaths[]=' + bourbon)
-      },
+      {test: /\.styl$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader!stylus-loader')},
       {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract('style-loader', 'css-loader?sourceMap&root=' + absSrc)

@@ -1,0 +1,38 @@
+@import 'variables.styl'
+@import 'fonts.styl'
+
+.tabs
+  list-style none
+  float left
+  margin 10px 0 0 20px
+  padding 0
+
+  li
+    float left
+    border 2px solid $color-primary
+    border-bottom none
+    margin-right 10px
+    line-height 36px
+    font-size 16px
+    a
+      padding 0 15px
+
+    &.selected-tab
+      background $color-primary
+
+    .close
+      float right
+      margin-right 10px
+      padding 0
+
+.add-tab
+  float left
+  padding 0 10px
+  font-size 18px
+  line-height 36px
+  margin-top 10px
+  outline none
+  background none
+  border none
+  font-family 'Bariol Bold'
+
