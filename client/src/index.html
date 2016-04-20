@@ -17,17 +17,19 @@
     <a class="header-title" href="http://www.gapminder.org">
       GAPMINDER TOOLS
     </a>
-    <button ng-click="newTab()">new tab</button>
+    <!--<button ng-click="newTab()">new tab</button>-->
 
-    <input type="button" ng-click="ddf.popup = true" value="Load DDF" />
+    <!--<input type="button" ng-click="ddf.popup = true" value="Load DDF" />-->
 
-    <ul id="tabs">
-      <li ng-repeat="tab in tabs">
-        <a ng-class="{'selected-tab': tab.id === currentTab}"
-           ng-click="setTab(tab.id)">tab #{{tab.id}} <a ng-click="closeTab(tab.id)">X</a>
+    <ul id="tabs" class="tabs">
+      <li ng-repeat="tab in tabs"  ng-class="{'selected-tab': tab.id === currentTab}">
+        <a
+           ng-click="setTab(tab.id)">tab #{{tab.id}}
         </a>
+        <a class="close" ng-click="closeTab(tab.id)">X</a>
       </li>
     </ul>
+    <button class="add-tab" ng-click="newTab()">+</button>
 
     <div class="pre-popup" ng-if="ddf.popup === true">
 
@@ -114,6 +116,20 @@
         <input type="button" ng-click="closeDdf()" value="Close" />
       </div>
     </div>
+
+    <div class="menu-mobile" ng-click="navCollapsed = !navCollapsed" ng-class="navCollapsed ? 'open' : '' ">
+      <div class="icon"></div>
+    </div>
+
+    <ul class="nav navbar-nav navbar-nav-left mobile" ng-if="navCollapsed" nav-expandable="" >
+      <li>asdasda</li>
+      <li>asdasda</li>
+      <li>asdasda</li>
+      <li>asdasda</li>
+      <li>asdasda</li>
+    </ul>
+
+
   </div>
 
   <div ng-repeat="tab in tabs | orderBy: '-id' track by tab.id"
