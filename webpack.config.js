@@ -12,7 +12,7 @@ var bourbon = require('node-bourbon').includePaths;
 var _ = require('lodash');
 
 var isProduction = process.env.NODE_ENV === 'production';
-var isElectronApp = process.env.IS_ELECTRON_APP;
+var isElectronApp = !!process.env.IS_ELECTRON_APP;
 
 var config = {
   template: 'index.html',
@@ -41,6 +41,7 @@ var baseConfig = {
   },
   output: {
     path: absDest,
+    isElectronApp: isElectronApp,
     publicPath: isElectronApp ? './' : config.publicPath,
     filename: 'components/[name]-[hash:6].js',
     chunkFilename: 'components/[name]-[hash:6].js'
@@ -117,7 +118,7 @@ var wOptions = {
     }),
     new HtmlWebpackPlugin({
       filename: 'electronIndex.html',
-      template: path.join(config.src, 'electronIndex.html'),
+      template: path.join(config.src, 'index.html'),
       chunks: ['angular', 'vizabi-tools', 'ga'],
       minify: true
     }),

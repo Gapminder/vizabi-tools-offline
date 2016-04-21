@@ -1,9 +1,9 @@
 # Gapminder Tools Offline App
 > This is the gapminder tools offline app
 
-### How to build the Chrome app
+## User guide
 
-  * Just run `npm run build`
+User guide for this solution is [here](doc/user-guide.md)
 
 ### How to run packed (builded) Chrome app:
 
@@ -18,12 +18,9 @@
   * Navigate to the directory in which your the unzipped files live, and select it(edited)
 
 ### How to build the Electron app
-
-  * install `electron-packager`
-  * `npm run electron`
-  * `electron-packager . tools-vizabi --platform=all  --arch=x64 --version=0.37.5 --overwrite`
+ * `npm run build-chrome`
 
 ### How to run the Electron app for development
+  * `npm run build`
 
-  * change directory to expected: tools-vizabi-x; for example `tools-vizabi-win32-x64` for windows
-  * run `tools-vizabi` for linux or `tools-vizabi.exe` for windows
+Zip archives with expected versions will be placed to root folder of the project.

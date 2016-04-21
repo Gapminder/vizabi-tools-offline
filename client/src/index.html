@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="gapminderTools">
 <head>
+  {% if (!o.webpackConfig.output.isElectronApp) { %}
   <base href="/tools/">
-  <title>Gapminder Tools</title>
+  {% } %}
+  <title>Gapminder Offline</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   {% for (var prop in o.htmlWebpackPlugin.files.css) { %}
   <link href="{%= o.htmlWebpackPlugin.files.css[prop] %}" rel="stylesheet" type="text/css">
   {% } %}
   <link href="./favicon.ico" rel="shortcut icon">
+  <style>
+    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+      display: none !important;
+    }
+  </style>
 </head>
 <body ng-controller="gapminderToolsCtrl" ng-class="{loading : loading}" class="{{ bodyClass }}" ng-cloak>
 <div class="wrapper" ng-class="{hidden : loadingError}">
@@ -17,14 +24,10 @@
     <a class="header-title" href="http://www.gapminder.org">
       GAPMINDER TOOLS
     </a>
-    <!--<button ng-click="newTab()">new tab</button>-->
-
-    <!--<input type="button" ng-click="ddf.popup = true" value="Load DDF" />-->
-
     <ul id="tabs" class="tabs">
       <li ng-repeat="tab in tabs"  ng-class="{'selected-tab': tab.id === currentTab}">
         <a
-           ng-click="setTab(tab.id)">tab #{{tab.id}}
+           ng-click="setTab(tab.id)">{{tab.tabName}} {{tab.id+1}}
         </a>
         <a class="close" ng-click="closeTab(tab.id)">X</a>
       </li>
@@ -38,13 +41,18 @@
           <option value="">choose graph type</option>
           <option ng-repeat="type in ddf.types" value="{{type.value}}">{{type.name}}</option>
         </select>
-        <input type="button" ng-click="loadChromeFs()" value="Select root folder" />
-        <input type="button" ng-click="loadMeasures()" ng-disabled="!hasChromeFs()" value="Load measures" />
-        <input type="button" ng-click="defaults()" ng-disabled="!hasChromeFs()" value="Default path prefixes"/>
+        <input type="button" ng-click="loadChromeFs()" ng-if="config.isChromeApp" ng-disabled="ddf.chromeExternalDdfPath === 'false'" value="Select root folder" />
+        <input type="button" ng-click="loadMeasures()" ng-disabled="ddf.chromeExternalDdfPath === 'true' && !hasChromeFs()" value="Load measures" />
+        <input type="button" ng-click="defaults()" value="Default path prefixes"/>
         <input type="button" ng-click="expertMode = !expertMode" value="Expert mode {{expertMode ? '[OFF]' : '[ON]'}}"/>
       </div>
 
-      <div class="popup-block"><label>DDF folder</label> <b>{{chromeFsRootPath}}</b></div>
+      <div ng-if="config.isChromeApp" class="popup-block">
+        <label>DDF path type</label>:
+        <label><input type="radio" ng-model="ddf.chromeExternalDdfPath" value="false" ng-change='defaults()'> Native</label>
+        <label><input type="radio" ng-model="ddf.chromeExternalDdfPath" value="true" ng-change='defaults()'> External</label>
+      </div>
+      <div class="popup-block" ng-if="ddf.chromeExternalDdfPath === 'true'"><label>Custom DDF folder</label> <b>{{chromeFsRootPath}}</b></div>
 
       <div class="popup-block" ng-if="!!ddfError" style="color: red;">{{ddfError}}</div>
 
@@ -109,26 +117,26 @@
       </div>
 
       <div class="popup-footer">
+
         <input type="button"
-               ng-disabled="(ddfError || !hasChromeFs()) && ((ddf.type === 'BubbleChart' || ddf.type === 'MountainChart') && (!ddf.xAxis || !ddf.yAxis || !ddf.sizeAxis)) || (ddf.type === 'BubbleMap' && !ddf.sizeAxis)"
+               ng-disabled="cantGo()"
                ng-click="openDdf()"
                value="Go" />
         <input type="button" ng-click="closeDdf()" value="Close" />
       </div>
     </div>
 
-    <div class="menu-mobile" ng-click="navCollapsed = !navCollapsed" ng-class="navCollapsed ? 'open' : '' ">
+    <div class="menu-mobile" ng-click="navCollapsed = !navCollapsed;" ng-class="navCollapsed ? 'open' : '' ">
       <div class="icon"></div>
     </div>
 
     <ul class="nav navbar-nav navbar-nav-left mobile" ng-if="navCollapsed" nav-expandable="" >
-      <li>asdasda</li>
-      <li>asdasda</li>
-      <li>asdasda</li>
-      <li>asdasda</li>
-      <li>asdasda</li>
+      <li style="color: grey">About</li>
+      <li style="color: grey">Version</li>
+      <li style="color: grey">Look for updates</li>
+      <li style="color: grey">Provide feedback</li>
+      <li><a href ng-click="loadFolderOptions()">Load DDF folder option</a></li>
     </ul>
-
 
   </div>
 
@@ -141,7 +149,7 @@
 
 <div class="wrapper-error" ng-class="{hidden : !loadingError}">
   <!--Error-->
-  <h1 class="header-title">GAPMINDER TOOLS</h1>
+  <h1 class="header-title">Gapminder Offline</h1>
 
   <h2>Ops! Something went terribly wrong</h2>
 </div>

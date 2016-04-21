@@ -23,16 +23,14 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    icon: 'file://' +__dirname + '/client/dist/tools/favicon.ico',
     'min-width': 800,
     'min-height': 200,
-    'accept-first-mouse': true,
-    'title-bar-style': 'hidden'
+    'accept-first-mouse': true
   });
 
   // and load the index.html of the app.
-  //mainWindow.loadUrl(LOAD_URL + '/tools/index.html');
-  //mainWindow.loadUrl('./client/dist/tools/index.html');
-  mainWindow.loadUrl('file://' + __dirname + '/client/dist/tools/electronIndex.html');
+  mainWindow.loadUrl('file://' + __dirname + '/client/dist/tools/index.html');
 
   // Open the DevTools.
   if (process.env.NODE_ENV === 'development') {

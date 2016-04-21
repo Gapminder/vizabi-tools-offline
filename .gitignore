@@ -20,7 +20,8 @@ logs
 results
 
 chrome-app/tools/*
-tools-vizabi-*/*
+Vizabi Offline-*/*
+Vizabi Offline-*
 
 npm-debug.log
 node_modules

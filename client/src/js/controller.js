@@ -21,18 +21,16 @@ function safeApply(scope, fn) {
 
 module.exports = function (app) {
   app
-    .controller('gapminderToolsCtrl', [
-      '$scope', '$route', '$routeParams', '$location',
-      'vizabiFactory', '$window', 'config', 'readerService', 'BookmarksService', '$timeout',
-      function ($scope, $route, $routeParams, $location, vizabiFactory,
-                $window, config, readerService, BookmarksService, $timeout) {
+    .controller('gapminderToolsCtrl', ['$scope', 'config', '$timeout',
+      function ($scope, config, $timeout) {
         var placeholder = document.getElementById('vizabi-placeholder1');
-        var bookmarks = new BookmarksService(readerService);
-        var url = '';
+        var electronUrl = '';
 
         if (config.isElectronApp) {
-          url = path.join('file://', config.electronPath, 'chrome-app/data/gw') + '/';
+          electronUrl = path.join('file://', config.electronPath, 'chrome-app/data/gw') + '/';
         }
+
+        $scope.config = config;
 
         var metadataContent = '';
         var translationsContent = '';
@@ -41,14 +39,13 @@ module.exports = function (app) {
         $scope.lastTab = -1;
         $scope.tabs = [];
         $scope.expertMode = false;
+        $scope.navCollapsed = false;
 
         $scope.ddf = {
           url: '',
           metadataUrl: '',
           translationsUrl: '',
-          /*url: 'https://raw.githubusercontent.com/buchslava/ddf--gapminder_world/master/output/ddf/',
-           metadataUrl: 'https://raw.githubusercontent.com/semio/ddf--gapminder_world/master/output/vizabi/metadata.json',
-           translationsUrl: 'https://raw.githubusercontent.com/semio/ddf--gapminder_world/master/output/vizabi/en.json',*/
+          chromeExternalDdfPath: 'false',
           type: 'BubbleChart',
           types: [
             {value: 'BubbleChart', name: 'Bubble Chart'},
@@ -58,17 +55,11 @@ module.exports = function (app) {
           measures: [],
           dimensions: [],
           popup: false,
-          /*xAxis: 'gdppercapita_us_inflation_adjusted',
-           yAxis: 'life_expectancy_at_birth_data_from_ihme',
-           sizeAxis: 'population_total',
-           xAxis: 'sg_gdp_p_cap_const_ppp2011_dollar',
-           yAxis: 'sg_population',
-           sizeAxis: 'sg_gini',*/
-          xAxis: '',
-          yAxis: '',
-          sizeAxis: '',
+          xAxis: 'income_per_person_gdppercapita_ppp_inflation_adjusted',
+          yAxis: 'life_expectancy_years',
+          sizeAxis: 'population_total',
           startTime: "1990",
-          currentTime: '2009',
+          currentTime: '2015',
           endTime: '2015',
           expectedMeasuresQuery: '',
           mainQuery: {}
@@ -84,43 +75,58 @@ module.exports = function (app) {
         $scope.favorites = {};
         $scope.selectedGraph = null;
 
-        $scope.defaults = function () {
-          $scope.ddf.url = url + 'ddf';
-          $scope.ddf.metadataUrl = url + 'vizabi/metadata.json';
-          $scope.ddf.translationsUrl = url + 'vizabi/en.json';
+        $scope.defaults = function (cb) {
+          Ddf.chromeFs = null;
+          $scope.chromeFsRootPath = '';
+
+          if (config.isElectronApp) {
+            $scope.ddf.url = electronUrl + 'ddf';
+            $scope.ddf.metadataUrl = electronUrl + 'vizabi/metadata.json';
+            $scope.ddf.translationsUrl = electronUrl + 'vizabi/en.json';
+          }
+
+          if (config.isChromeApp && $scope.ddf.chromeExternalDdfPath === 'false') {
+            $scope.ddf.url = '../data/gw/ddf';
+            $scope.ddf.metadataUrl = '../data/gw/vizabi/metadata.json';
+            $scope.ddf.translationsUrl = '../data/gw/vizabi/en.json';
+          }
+
+          if (config.isChromeApp && $scope.ddf.chromeExternalDdfPath === 'true') {
+            $scope.ddf.url = 'ddf';
+            $scope.ddf.metadataUrl = 'vizabi/metadata.json';
+            $scope.ddf.translationsUrl = 'vizabi/en.json';
+          }
+
           $scope.ddf.expectedMeasuresQuery = formatJson.plain(entitiesQueryTemplate);
           $scope.ddf.mainQuery = {};
           Object.keys(mainQueryTemplate).forEach(function (key) {
             $scope.ddf.mainQuery[key] = formatJson.plain(mainQueryTemplate[key]);
           });
+
+          if (config.isElectronApp || (config.isChromeApp && $scope.ddf.chromeExternalDdfPath === 'false')) {
+            $scope.loadMeasures();
+          }
         };
 
         $scope.setTab = function (tabId) {
           //set current tab id and get current graph object
           $scope.currentTab = tabId;
           $scope.selectedGraph = _.findWhere($scope.tabs, {id: tabId}).graphName;
+          forceResizeEvt();
         };
 
-        $scope.openGraph = function (graphName) {
-          if ($scope.tabs.length === 0) {
-            //if there are no tabs - create one
-            $scope.newTab();
-          }
-          //render graph when tab is rendered
+        function forceResizeEvt() {
+          //force resize
           $timeout(function () {
-            var graph = $scope.graphs[graphName];
-            var tabIndex = $scope.tabs.map(function (el) {
-              return el.id;
-            }).indexOf($scope.currentTab);
-            $scope.tabs[tabIndex].graphName = graph.name;
-            $scope.selectedGraph = graph.name;
-            Vizabi._globals.gapminder_paths.baseUrl = '/';
-            renderGraph(graph);
+            var event = document.createEvent("HTMLEvents");
+            event.initEvent("resize", true, true);
+            event.eventName = "resize";
+            window.dispatchEvent(event);
           }, 0);
-        };
+        }
 
         $scope.loadChromeFs = function () {
-          if (config.isChromeApp) {
+          if (config.isChromeApp && $scope.ddf.chromeExternalDdfPath) {
             chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function (entry) {
               chrome.fileSystem.getDisplayPath(entry, function (path) {
                 Ddf.chromeFs = WebFS(entry);
@@ -128,6 +134,7 @@ module.exports = function (app) {
                 safeApply($scope, function () {
                   Ddf.reset();
                   $scope.chromeFsRootPath = path;
+                  $scope.loadMeasures();
                 });
               });
             });
@@ -138,7 +145,28 @@ module.exports = function (app) {
           return !!Ddf.chromeFs;
         };
 
-        $scope.loadMeasures = function () {
+        function areMeasuresBadForGo() {
+          function areMeasuresBadForGoForBubbleMap() {
+            return $scope.ddf.type === 'BubbleMap' && !$scope.ddf.sizeAxis;
+          }
+
+          function areMeasuresBadForGoForBubbleAndMountainCharts() {
+            return (($scope.ddf.type === 'BubbleChart' || $scope.ddf.type === 'MountainChart') &&
+            (!$scope.ddf.xAxis || !$scope.ddf.yAxis || !$scope.ddf.sizeAxis));
+          }
+
+          return areMeasuresBadForGoForBubbleMap() || areMeasuresBadForGoForBubbleAndMountainCharts();
+        }
+
+        function chromeAppIsBadForGo() {
+          return config.isChromeApp && $scope.ddf.chromeExternalDdfPath === 'true' && !$scope.hasChromeFs();
+        }
+
+        $scope.cantGo = function () {
+          return $scope.ddfError || areMeasuresBadForGo() || chromeAppIsBadForGo();
+        };
+
+        $scope.loadMeasures = function (cb) {
           $scope.ddfError = '';
           $scope.ddf.dimensions = [];
           $scope.ddf.measures = [];
@@ -202,6 +230,10 @@ module.exports = function (app) {
                     } catch (e) {
                       $scope.ddfError += '\nWrong JSON format for translations: ' + e;
                     }
+
+                    if (cb) {
+                      cb();
+                    }
                   });
                 });
               });
@@ -251,10 +283,9 @@ module.exports = function (app) {
           }
 
           if ($scope.tabs.length === 0) {
-            //if there are no tabs - create one
             $scope.newTab();
           }
-          //render graph when tab is rendered
+
           $timeout(function () {
             var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
             if ($scope.ddf.type === 'BubbleChart' || $scope.ddf.type === 'MountainChart') {
@@ -276,7 +307,7 @@ module.exports = function (app) {
             $scope.ddf.popup = false;
 
             if (config.isElectronApp) {
-              Vizabi._globals.ext_resources.host = url;
+              Vizabi._globals.ext_resources.host = electronUrl;
               Vizabi._globals.ext_resources.preloadPath = '../../preview/data/';
             }
 
@@ -287,15 +318,33 @@ module.exports = function (app) {
             });
 
             queryObj.data.ddfPath = $scope.ddf.url;
-            vizabiFactory.render($scope.ddf.type, placeholder, queryObj);
+            Vizabi($scope.ddf.type, placeholder, queryObj);
           }, 0);
         };
 
-        $scope.newTab = function () {
-          //create new tab and set current tab
+        $scope.newTab = function (withoutChart) {
           ++$scope.lastTab;
-          $scope.tabs.push({id: $scope.lastTab});
+
+          var tabName = $scope.ddf.types.find(function (type) {
+            return type.value === $scope.ddf.type;
+          }).name;
+
+          $scope.tabs.push({id: $scope.lastTab, tabName: tabName});
           $scope.setTab($scope.lastTab);
+
+          if (withoutChart !== false) {
+            $scope.loadMeasures(function () {
+              $scope.openDdf();
+            });
+          }
+        };
+
+        $scope.loadFolderOptions = function () {
+          $scope.navCollapsed = false;
+          $scope.newTab(false);
+          $scope.loadMeasures(function () {
+            $scope.ddf.popup = true;
+          });
         };
 
         $scope.closeTab = function (tabId) {
@@ -305,25 +354,7 @@ module.exports = function (app) {
           $scope.tabs = _.without($scope.tabs, _.findWhere($scope.tabs, {id: tabId}));
         };
 
-        $scope.addToFavorites = function (graphName) {
-          $scope.favorites[graphName] = $scope.graphs[graphName];
-          bookmarks.add($scope.graphs[graphName]);
-        };
-
-        $scope.removeFromFavorites = function (graphName) {
-          delete $scope.favorites[graphName];
-        };
-
-        //change location for the chrome and the electron apps
-        $scope.url = function (url) {
-          $location.path(url);
-        };
-
-        function renderGraph(graph) {
-          var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
-          vizabiFactory.render(graph.tool, placeholder, graph.opts);
-        }
-
         $scope.defaults();
+        $scope.newTab();
       }]);
 };

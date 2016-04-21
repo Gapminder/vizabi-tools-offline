@@ -36,7 +36,7 @@ exports.mainQueryTemplate = {
         },
         color: {
           use: "property",
-          which: "geo.geographic_regions_in_4_colors", //
+          which: "geo.world_4region", //
           scaleType: "ordinal",
           allow: {names: ["!geo.name"]}
         },
@@ -134,7 +134,7 @@ exports.mainQueryTemplate = {
         },
         color: {
           use: "property",
-          which: "geo.geographic_regions_in_4_colors",
+          which: "geo.world_4region",
           scaleType: "ordinal",
           allow: {
             names: ["!geo.name"]
@@ -205,7 +205,7 @@ exports.mainQueryTemplate = {
         },
         color: {
           use: "property",
-          which: "geo.geographic_regions_in_4_colors",
+          which: "geo.world_4region",
           scaleType: "ordinal",
           allow: {
             names: ["!geo.name"]
