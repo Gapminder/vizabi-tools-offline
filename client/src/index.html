@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="gapminderTools">
 <head>
+  {% if (!o.webpackConfig.output.isElectronApp) { %}
   <base href="/tools/">
-  <title>Gapminder Tools</title>
+  {% } %}
+  <title>Gapminder Offline</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   {% for (var prop in o.htmlWebpackPlugin.files.css) { %}
   <link href="{%= o.htmlWebpackPlugin.files.css[prop] %}" rel="stylesheet" type="text/css">
   {% } %}
   <link href="./favicon.ico" rel="shortcut icon">
+  <style>
+    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+      display: none !important;
+    }
+  </style>
 </head>
 <body ng-controller="gapminderToolsCtrl" ng-class="{loading : loading}" class="{{ bodyClass }}" ng-cloak>
 <div class="wrapper" ng-class="{hidden : loadingError}">
@@ -17,131 +24,132 @@
     <a class="header-title" href="http://www.gapminder.org">
       GAPMINDER TOOLS
     </a>
-    <button ng-click="newTab()">new tab</button>
-
-    <label><input type="radio" ng-model="mode" value="default">default</label>
-    <label><input type="radio" ng-model="mode" value="ddf">ddf</label>&nbsp;&nbsp;
-
-    <select ng-if="mode==='default'" ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
-      <option value="">choose graph</option>
-      <option ng-repeat="graph in graphs">{{graph.name}}</option>
-    </select>
-
-    <select ng-if="mode==='ddf'" ng-model="ddf.type">
-      <option value="">choose graph type</option>
-      <option ng-repeat="type in ddf.types" value="{{type.value}}">{{type.name}}</option>
-    </select>
-
-    <label ng-if="mode==='ddf'">DDF data URL<input type="text" ng-model="ddf.url"></label>
-    <input type="button" ng-if="mode==='ddf'" ng-click="loadDdf()" value="Load" />
-
-    <br ng-if="mode==='ddf'">
-
-    <label ng-if="mode==='ddf'">Chart Geo<input type="text" ng-model="ddf.geoChart"></label>
-    <label ng-if="mode==='ddf'">Colors Geo<input type="text" ng-model="ddf.geoColors"></label>
-
-    <span ng-if="mode!=='ddf'">List of favorites:</span>
-    <select ng-if="mode!=='ddf'" ng-model="selectedGraph" ng-change="openGraph(selectedGraph)">
-      <option value="">choose graph</option>
-      <option ng-repeat="graph in favorites">{{graph.name}}</option>
-    </select>
-    <ul id="tabs">
-      <li ng-repeat="tab in tabs">
-        <a ng-class="{'selected-tab': tab.id === currentTab}"
-           ng-click="setTab(tab.id)">tab #{{tab.id}} <a ng-click="closeTab(tab.id)">X</a>
+    <ul id="tabs" class="tabs">
+      <li ng-repeat="tab in tabs"  ng-class="{'selected-tab': tab.id === currentTab}">
+        <a
+           ng-click="setTab(tab.id)">{{tab.tabName}} {{tab.id+1}}
         </a>
+        <a class="close" ng-click="closeTab(tab.id)">X</a>
       </li>
     </ul>
+    <button class="add-tab" ng-click="newTab()">+</button>
 
     <div class="pre-popup" ng-if="ddf.popup === true">
+
+      <div class="popup-block">
+        <select ng-model="ddf.type">
+          <option value="">choose graph type</option>
+          <option ng-repeat="type in ddf.types" value="{{type.value}}">{{type.name}}</option>
+        </select>
+        <input type="button" ng-click="loadChromeFs()" ng-if="config.isChromeApp" ng-disabled="ddf.chromeExternalDdfPath === 'false'" value="Select root folder" />
+        <input type="button" ng-click="loadMeasures()" ng-disabled="ddf.chromeExternalDdfPath === 'true' && !hasChromeFs()" value="Load measures" />
+        <input type="button" ng-click="defaults()" value="Default path prefixes"/>
+        <input type="button" ng-click="expertMode = !expertMode" value="Expert mode {{expertMode ? '[OFF]' : '[ON]'}}"/>
+      </div>
+
+      <div ng-if="config.isChromeApp" class="popup-block">
+        <label>DDF path type</label>:
+        <label><input type="radio" ng-model="ddf.chromeExternalDdfPath" value="false" ng-change='defaults()'> Native</label>
+        <label><input type="radio" ng-model="ddf.chromeExternalDdfPath" value="true" ng-change='defaults()'> External</label>
+      </div>
+      <div class="popup-block" ng-if="ddf.chromeExternalDdfPath === 'true'"><label>Custom DDF folder</label> <b>{{chromeFsRootPath}}</b></div>
+
+      <div class="popup-block" ng-if="!!ddfError" style="color: red;">{{ddfError}}</div>
+
+      <div class="popup-block">
+        <label>DDF default data folder (folder)&nbsp;<input type="text" ng-model="ddf.url" size="40"></label>
+      </div>
+
+      <div class="popup-block">
+        <label>DDF default metadata prefix (folder&file name)&nbsp;<input type="text" ng-model="ddf.metadataUrl" size="40"></label>
+      </div>
+
+      <div class="popup-block">
+        <label>DDF default translations prefix (folder&file name)&nbsp;<input type="text" ng-model="ddf.translationsUrl" size="40"></label>
+      </div>
+
+      <div class="popup-block" ng-if="expertMode">
+        Main query for Vizabi for different charts (GW - default)<br>
+        <textarea ng-model="ddf.mainQuery[ddf.type]" rows="12" cols="100" style="font-size: x-small;"></textarea>
+        <br>
+        Entities query (GW default)<br>
+        <textarea ng-model="ddf.expectedMeasuresQuery" rows="4" cols="100" style="font-size: x-small;"></textarea>
+      </div>
+
       <div ng-if="ddf.type === 'BubbleChart' || ddf.type === 'MountainChart'">
         <div class="popup-block">
           X axis:
-          <select ng-model="ddf.xAxis">
+          <select ng-model="ddf.xAxis" ng-disabled="ddf.measures.length < 1">
             <option value="">choose measure</option>
-            <option ng-repeat="axis in ddf.measures" value="{{axis.measure}}">{{axis.name}}</option>
+            <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
         <div class="popup-block">
           Y axis:
-          <select ng-model="ddf.yAxis">
+          <select ng-model="ddf.yAxis" ng-disabled="ddf.measures.length < 1">
             <option value="">choose measure</option>
-            <option ng-repeat="axis in ddf.measures" value="{{axis.measure}}">{{axis.name}}</option>
+            <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
         <div class="popup-block">
           Size axis:
-          <select ng-model="ddf.sizeAxis">
+          <select ng-model="ddf.sizeAxis" ng-disabled="ddf.measures.length < 1">
             <option value="">choose measure</option>
-            <option ng-repeat="axis in ddf.measures" value="{{axis.measure}}">{{axis.name}}</option>
+            <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
       </div>
       <div ng-if="ddf.type === 'BubbleMap'">
         <div class="popup-block">
           Size measure:
-          <select ng-model="ddf.sizeAxis">
+          <select ng-model="ddf.sizeAxis" ng-disabled="ddf.measures.length < 1">
             <option value="">choose measure</option>
-            <option ng-repeat="axis in ddf.measures" value="{{axis.measure}}">{{axis.name}}</option>
+            <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
       </div>
+
       <div class="popup-block">
         Current time:
         <input type="text" ng-model="ddf.currentTime">
-      </div>
-      <div class="popup-block">
         End time:
         <input type="text" ng-model="ddf.endTime">
       </div>
+
       <div class="popup-footer">
+
         <input type="button"
-               ng-disabled="((ddf.type === 'BubbleChart' || ddf.type === 'MountainChart') && (!ddf.xAxis || !ddf.yAxis || !ddf.sizeAxis)) || (ddf.type === 'BubbleMap' && !ddf.sizeAxis)"
+               ng-disabled="cantGo()"
                ng-click="openDdf()"
                value="Go" />
         <input type="button" ng-click="closeDdf()" value="Close" />
       </div>
     </div>
 
-    <div class="menu-mobile" ng-click="navCollapsed = !navCollapsed"  ng-class="navCollapsed ? 'open' : '' ">
+    <div class="menu-mobile" ng-click="navCollapsed = !navCollapsed;" ng-class="navCollapsed ? 'open' : '' ">
       <div class="icon"></div>
     </div>
-  </div>
 
-  <button ng-show="!favorites[selectedGraph]"
-          ng-click="addToFavorites(selectedGraph)">add to favorites</button>
-  <button ng-show="favorites[selectedGraph]"
-          ng-click="removeFromFavorites(selectedGraph)">remove from favorites</button>
+    <ul class="nav navbar-nav navbar-nav-left mobile" ng-if="navCollapsed" nav-expandable="" >
+      <li style="color: grey">About</li>
+      <li style="color: grey">Version</li>
+      <li style="color: grey">Look for updates</li>
+      <li style="color: grey">Provide feedback</li>
+      <li><a href ng-click="loadFolderOptions()">Load DDF folder option</a></li>
+    </ul>
+
+  </div>
 
   <div ng-repeat="tab in tabs | orderBy: '-id' track by tab.id"
        class="column main"
        ng-show="currentTab === tab.id"
        id="vizabi-placeholder{{tab.id}}">
   </div>
-
-  <!--More-->
-  <div class="more">
-    <div class="about">
-      <h2 class="heading-2">See also</h2>
-
-      <div class="menu"></div>
-      <ul class="menu-primary">
-        <li class="menu-item" ng-repeat="(key, tool) in tools track by $index">
-          <a ng-hide="activeTool == key"
-             ng-click="url(key)">
-            <span class="title">{{::tool.title}}</span>
-            <img class="image" ng-src="{{::tool.image}}">
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-
 </div>
 
 <div class="wrapper-error" ng-class="{hidden : !loadingError}">
   <!--Error-->
-  <h1 class="header-title">GAPMINDER TOOLS</h1>
+  <h1 class="header-title">Gapminder Offline</h1>
 
   <h2>Ops! Something went terribly wrong</h2>
 </div>

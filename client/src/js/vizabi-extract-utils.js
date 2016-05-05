@@ -68,6 +68,8 @@ function deepCloneArray(arr) {
   return clone;
 }
 
+exports.deepCloneArray = deepCloneArray;
+
 exports.deepExtend = function deepExtend(/*obj_1, [obj_2], [obj_N]*/) {
   if (arguments.length < 1 || typeof arguments[0] !== 'object') {
     return false;
@@ -131,3 +133,24 @@ exports.deepExtend = function deepExtend(/*obj_1, [obj_2], [obj_N]*/) {
 
   return target;
 };
+
+function unique(arr, func) {
+  var u = {};
+  var a = [];
+  if(!func) {
+    func = function(d) {
+      return d;
+    };
+  }
+  for(var i = 0, l = arr.length; i < l; i += 1) {
+    var key = func(arr[i]);
+    if(u.hasOwnProperty(key)) {
+      continue;
+    }
+    a.push(arr[i]);
+    u[key] = 1;
+  }
+  return a;
+}
+
+exports.unique = unique;

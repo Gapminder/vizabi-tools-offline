@@ -1,88 +1,90 @@
-exports.queryTemplate = {
+exports.entitiesQueryTemplate = {
+  select: ["geo", "geo.name", "geo.geographic_regions_in_4_colors"],
+  where: {"geo.is--country": true}
+};
+
+exports.mainQueryTemplate = {
   BubbleChart: {
-    data: {
-      reader: 'ddfcsv',
-      splash: false
-    },
-    ui: {
-      buttons: ['colors', 'find', 'trails', 'lock', 'size', 'moreoptions', 'fullscreen'],
-      dialogs: {
-        'popup': ['colors', 'find', 'size', 'moreoptions'],
-        'sidebar': ['colors', 'find', 'size'],
-        'moreoptions': ['opacity', 'speed', 'axes', 'size', 'colors', 'presentation']
-      }
-    },
     state: {
       time: {
-        start: "1800",
+        start: "", //
         end: "", //
         value: "", //
-        step: 1,
-        formatInput: "%Y",
-        trails: true,
-        lockNonSelected: 0,
-        adaptMinMaxZoom: false
+        step: 1
       },
       entities: {
         dim: "geo",
-        show: {
-          "geo.cat": [] //
-        }
+        show: {"geo.is--country": true}
       },
       marker: {
         space: ["entities", "time"],
         type: "geometry",
         shape: "circle",
-        label: {
-          use: "property",
-          which: "geo.name"
-        },
+        label: {use: "property", which: "geo.name"},
+        size_label: {"use": "constant"},
         axis_y: {
           use: "indicator",
-          which: "",//
+          which: "", //
           scaleType: "linear",
-          allow: {
-            scales: ["linear", "log"]
-          }
+          allow: {scales: ["linear", "log"]}
         },
         axis_x: {
           use: "indicator",
-          which: "",//
+          which: "", //
           scaleType: "log",
-          allow: {
-            scales: ["linear", "log"]
-          }
+          allow: {"scales": ["linear", "log", "time"]}
         },
         color: {
           use: "property",
-          which: "", //
+          which: "geo.world_4region", //
           scaleType: "ordinal",
-          allow: {
-            names: ["!geo.name"]
-          },
-          palette: { //
-            _default: "#ffb600"
-          }
+          allow: {names: ["!geo.name"]}
         },
         size: {
           use: "indicator",
-          which: "",//
+          which: "", //
           scaleType: "linear",
-          allow: {
-            scales: ["linear", "log"]
-          },
-          min: .04,
-          max: .90
+          allow: {scales: ["linear"]},
+          extent: [0.04, 0.9]
         }
       }
+    },
+    data: {
+      reader: "ddf1csv",
+      splash: false
+    },
+    language: {id: "en", strings: {}},
+    ui: {
+      buttons: ["colors", "find", "size", "trails", "lock", "moreoptions", "fullscreen"],
+      buttons_expand: [],
+      dialogs: {
+        popup: ["colors", "find", "size", "zoom", "moreoptions"],
+        sidebar: ["colors", "find", "size", "zoom"],
+        moreoptions: ["opacity", "speed", "axes", "size", "colors", "label", "zoom", "presentation", "about"]
+      },
+      chart: {
+        whenHovering: {
+          showProjectionLineX: true,
+          showProjectionLineY: true,
+          higlightValueX: true,
+          higlightValueY: true
+        },
+        labels: {dragging: true, removeLabelBox: false},
+        trails: true,
+        lockNonSelected: 0,
+        adaptMinMaxZoom: false
+      },
+      presentation: false,
+      cursorMode: "arrow",
+      noZoomOnScrolling: true
     }
   },
   MountainChart: {
     state: {
       time: {
-        start: "1800",
-        end: "2015",
-        value: "2015",
+        start: "", //
+        end: "", //
+        value: "", //
         step: 1,
         delay: 100,
         delayThresholdX2: 50,
@@ -102,12 +104,7 @@ exports.queryTemplate = {
       },
       entities: {
         dim: "geo",
-        opacitySelectDim: .3,
-        opacityRegular: .6,
-        show: {
-          "geo": ["*"],
-          "geo.cat": [] //
-        }
+        show: {"geo.is--country": true}
       },
       marker: {
         space: ["entities", "time"],
@@ -126,8 +123,8 @@ exports.queryTemplate = {
           //which: "gdp_p_cap_const_ppp2011_dollar",
           which: "",//
           scaleType: 'log'/*,
-          min: .11, //0
-          max: 500 //100*/
+           min: .11, //0
+           max: 500 //100*/
         },
         size: {
           use: "indicator",
@@ -137,7 +134,7 @@ exports.queryTemplate = {
         },
         color: {
           use: "property",
-          which: "", //
+          which: "geo.world_4region",
           scaleType: "ordinal",
           allow: {
             names: ["!geo.name"]
@@ -155,9 +152,9 @@ exports.queryTemplate = {
         }
       }
     },
-    language: 'en',
+    language: {id: "en", strings: {}},
     data: {
-      reader: "ddfcsv",
+      reader: "ddf1csv",
       splash: false
     },
     ui: {
@@ -169,9 +166,9 @@ exports.queryTemplate = {
   BubbleMap: {
     state: {
       time: {
-        start: "1800",
-        end: "2015",
-        value: "2015",
+        start: "", //
+        end: "", //
+        value: "", //
         step: 1,
         speed: 300,
         formatInput: "%Y"
@@ -180,9 +177,7 @@ exports.queryTemplate = {
         dim: "geo",
         opacitySelectDim: .3,
         opacityRegular: 1,
-        show: {
-          "geo.cat": [] //
-        }
+        show: {"geo.is--country": true}
       },
       marker: {
         space: ["entities", "time"],
@@ -210,7 +205,7 @@ exports.queryTemplate = {
         },
         color: {
           use: "property",
-          which: "", //
+          which: "geo.world_4region",
           scaleType: "ordinal",
           allow: {
             names: ["!geo.name"]
@@ -218,11 +213,11 @@ exports.queryTemplate = {
         }
       }
     },
+    language: {id: "en", strings: {}},
     data: {
-      reader: "ddfcsv",
+      reader: "ddf1csv",
       splash: false
     },
-    language: 'en',
     ui: {
       buttons: [],
       dialogs: {popup: [], sidebar: [], moreoptions: []},

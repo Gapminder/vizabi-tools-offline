@@ -1,18 +1,19 @@
 var Vizabi = require('vizabi');
 var Promise = (require('./vizabi-extract-promise')).Promise;
 var utils = require('./vizabi-extract-utils');
-var ddfUtils = require('./vizabi-ddf-utils');
+var Ddf = require('./vizabi-ddf').Ddf;
 
-Vizabi.Reader.extend('ddfcsv', {
+Vizabi.Reader.extend('ddf1csv', {
 
   /**
    * Initializes the reader.
    * @param {Object} reader_info Information about the reader
    */
   init: function (reader_info) {
-    this._name = 'ddf-csv';
+    this._name = 'ddf1-csv';
     this._data = [];
-    this._ddfPath = reader_info.ddfPath;
+    this._ddfPath = reader_info.path;
+    this.ddf = new Ddf(this._ddfPath);
   },
 
   /**
@@ -22,56 +23,43 @@ Vizabi.Reader.extend('ddfcsv', {
    * @returns a promise that will be resolved when data is read
    */
   read: function (queryPar, language) {
-    // todo: add group by processing
-
     var _this = this;
     var query = utils.deepExtend({}, queryPar);
+    var p = new Promise();
 
-    _this.queryDescriptor = new ddfUtils.QueryDescriptor(queryPar);
+    _this.ddf.getIndex(function () {
+      // get `concepts` and `entities` in any case
+      // this data needed for query's kind (service, data point) detection
+      _this.ddf.getConceptsAndEntities(query, function (err, concepts, entities) {
+        if (err) {
+          p.reject(err);
+        }
 
-    if (_this.queryDescriptor.type === ddfUtils.GEO) {
-      return new Promise(function (resolve) {
-        ddfUtils.geoProcessing(_this._ddfPath, function () {
-          _this._data = _this.getGeoData(_this.queryDescriptor);
-          console.log('!GEO DATA', _this._data);
-          resolve();
-        });
+        // service query: it was detected by next criteria:
+        // all of `select` section of query parts are NOT measures
+        if (!err && _this.ddf.divideByQuery(query).measures.length <= 0) {
+          _this._data = entities;
+          p.resolve();
+        }
+
+        // data point query: it was detected by next criteria:
+        // at least one measure was detected in `select` section of the query
+        if (_this.ddf.divideByQuery(query).measures.length > 0) {
+          _this.ddf.getDataPoints(query, function (err, data) {
+            if (err) {
+              p.reject(err);
+            }
+
+            if (!err) {
+              _this._data = data;
+              p.resolve();
+            }
+          });
+        }
       });
-    }
+    });
 
-    if (_this.queryDescriptor.type === ddfUtils.MEASURES_TIME) {
-      return new Promise(function (resolve) {
-        ddfUtils.getIndex(_this._ddfPath).then(function () {
-          Promise
-            .all(_this.getExpectedMeasures(query))
-            .then(function () {
-              var result = [];
-              var geo = ddfUtils.CACHE.DATA_CACHED['geo-' + _this.queryDescriptor.cat];
-
-              _this.queryDescriptor.timeRanges.forEach(function (time) {
-                for (var geoIndex = 0; geoIndex < geo.length; geoIndex++) {
-                  var line = {
-                    'geo': geo[geoIndex].geo,
-                    'time': new Date(time)
-                  };
-
-                  if (_this.injectMeasureValues(query, line, geoIndex, time) === true) {
-                    result.push(line);
-                  }
-                }
-              });
-
-              _this._data = result;
-
-              console.log('!QUERY', JSON.stringify(query));
-              console.log('!OUT DATA', _this._data);
-              console.log('!METADATA', Vizabi._globals.metadata);
-
-              resolve();
-            });
-        });
-      });
-    }
+    return p;
   },
 
   /**
@@ -80,99 +68,6 @@ Vizabi.Reader.extend('ddfcsv', {
    */
   getData: function () {
     return this._data;
-  },
-
-  injectMeasureValues: function (query, line, geoIndex, time) {
-    var f = 0;
-    var measures = this.getMeasuresNames(query);
-    var geo = ddfUtils.CACHE.DATA_CACHED['geo-' + this.queryDescriptor.cat];
-
-    measures.forEach(function (m) {
-      var measureCache = ddfUtils.CACHE.FILE_CACHED[ddfUtils.CACHE.measureFileToName[m]];
-
-      if (measureCache && measureCache[geo[geoIndex].geo]) {
-        if (measureCache[geo[geoIndex].geo] && measureCache[geo[geoIndex].geo][time] &&
-          measureCache[geo[geoIndex].geo][time][m]) {
-          line[m] = Number(measureCache[geo[geoIndex].geo][time][m]);
-          f++;
-        }
-      }
-    });
-
-    if (query.select.indexOf('geo.latitude') > 0) {
-      line['geo.latitude'] = geo[geoIndex]['geo.latitude'];
-      ++f;
-    }
-
-    if (query.select.indexOf('geo.longitude') > 0) {
-      line['geo.longitude'] = geo[geoIndex]['geo.longitude'];
-      ++f;
-    }
-
-    return f === measures.length;
-  },
-
-  getGeoData: function (queryDescriptor) {
-    function adapter(geoRecord) {
-      var r = {
-        'geo.cat': queryDescriptor.cat
-      };
-      for (var key in geoRecord) {
-        if (geoRecord.hasOwnProperty(key)) {
-          r[(key === 'geo' ? '' : 'geo.') + key] = geoRecord[key];
-        }
-      }
-      return r;
-    }
-
-    var expectedGeoData = null;
-    for (var k in ddfUtils.CACHE.FILE_CACHED) {
-      if (ddfUtils.CACHE.FILE_CACHED.hasOwnProperty(k) &&
-        k.indexOf('ddf--list--geo--' + queryDescriptor.cat) >= 0) {
-        expectedGeoData = ddfUtils.CACHE.FILE_CACHED[k];
-        break;
-      }
-    }
-
-    var result = [];
-    if (expectedGeoData !== null) {
-      expectedGeoData.forEach(function (d) {
-        result.push(adapter(d));
-      });
-    }
-
-    ddfUtils.CACHE.DATA_CACHED['geo-' + queryDescriptor.cat] = result;
-    return result;
-  },
-
-  getMeasuresNames: function (query) {
-    var res = [];
-    query.select.forEach(function (q) {
-      if (q !== 'time' && q !== 'geo') {
-        res.push(q);
-      }
-    });
-
-    return res;
-  },
-
-  getExpectedMeasures: function (query) {
-    var _this = this;
-    var expected = [];
-
-    ddfUtils.CACHE.FILE_CACHED[ddfUtils.getIndexEntryPoint(_this._ddfPath)].forEach(function (indexRecord) {
-      // todo: fix condition -> geo
-      if (query.select.indexOf(indexRecord.value_concept) >= 0 &&
-        (!query.where['geo.cat'] || query.where['geo.cat'].indexOf(indexRecord.geo) >= 0)) {
-        var path = _this._ddfPath + '/' + indexRecord.file;
-        // todo: swap...
-        ddfUtils.CACHE.measureFileToName[indexRecord.value_concept] = path;
-        ddfUtils.CACHE.measureNameToFile[path] = indexRecord.value_concept;
-        expected.push(ddfUtils.load(path));
-      }
-    });
-
-    return expected;
   }
 });
 

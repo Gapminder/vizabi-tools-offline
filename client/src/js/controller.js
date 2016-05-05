@@ -1,12 +1,14 @@
 var Vizabi = require('vizabi');
 var async = require('async');
 var _ = require('lodash');
+var path = require('path');
+var formatJson = require('format-json');
+var WebFS = require('web-fs');
 
-var ddfUtils = require('./vizabi-ddf-utils');
-var queryTemplate = require('./templates/query').queryTemplate;
-var metadataTemplate = require('./templates/metadata').metadataTemplate;
-var translationsTemplate = require('./templates/translations').translationsTemplate;
-var queryForCsvReader = require('./templates/query-for-csv-reader').queryForCsvReader;
+var ddfLib = require('./vizabi-ddf');
+var Ddf = ddfLib.Ddf;
+var mainQueryTemplate = require('./templates/query').mainQueryTemplate;
+var entitiesQueryTemplate = require('./templates/query').entitiesQueryTemplate;
 
 function safeApply(scope, fn) {
   var phase = scope.$root.$$phase;
@@ -17,97 +19,33 @@ function safeApply(scope, fn) {
   }
 }
 
-function getRandomColor() {
-  var letters = '0123456789ABCDEF'.split('');
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
-
-function getColorized(what, index) {
-  var options = ['#ff5872', '#ffe700', '#7feb00', '#00d5e9', '#ffb600', '#ff5178', '#fbdd00',
-    '#5de200', '#00c8ec', '#ffaa14', '#ff658a', '#fff400', '#81f201', '#00e1ec', '#ffc500',
-    '#da0025', '#fbaf09', '#00b900', '#0098df', '#fb6d19', '#fa4e73', '#ffe700', '#b5ea32',
-    '#77dff7', '#ffb600', '#b2043a', '#b17f4a', '#008d36', '#0586c6', '#9b4838'
-  ];
-  var color = index < options.length ? options[index] : getRandomColor();
-  return {
-    key: what,
-    value: color
-  };
-}
-
 module.exports = function (app) {
   app
-    .controller('gapminderToolsCtrl', [
-      '$scope', '$route', '$routeParams', '$location',
-      'vizabiFactory', '$window', 'config', 'readerService', 'BookmarksService', '$timeout',
-      function ($scope, $route, $routeParams, $location, vizabiFactory,
-                $window, config, readerService, BookmarksService, $timeout) {
+    .controller('gapminderToolsCtrl', ['$scope', 'config', '$timeout',
+      function ($scope, config, $timeout) {
         var placeholder = document.getElementById('vizabi-placeholder1');
-        var bookmarks = new BookmarksService(readerService);
-
-        if (config.isChromeApp) {
-          //request storage in chrome file system
-          //@see: http://www.html5rocks.com/en/tutorials/file/filesystem/
-          window.webkitRequestFileSystem(window.PERSISTEN, 1024, onInitFs, function (err) {
-            if (err) {
-              console.log(err)
-            }
-          });
-        }
+        var electronUrl = '';
 
         if (config.isElectronApp) {
-          console.log('is electron app');
-          var path = require('path');
-          var remote = require('remote');
-          var app = remote.require('app');
-          var electronPath = app.getAppPath();
-
-          Vizabi._globals.gapminder_paths.baseUrl = path.join(electronPath, 'client/dist/tools/public/fixtures/');
-
-          Vizabi.Tool.define("preload", function (promise) {
-            console.log('preload start');
-            var vizabiContext = this;
-            async.parallel([
-                function (callback) {
-                  readerService.getFile({
-                    path: path.join(electronPath, 'client/dist/tools/public/fixtures/waffles/metadata.json'),
-                    type: 'json'
-                  }, callback);
-                },
-                function (callback) {
-                  readerService.getFile({
-                    path: path.join(electronPath, 'client/src/public/fixtures/translation/en.json'),
-                    type: 'json'
-                  }, callback);
-                }
-              ],
-              function (err, results) {
-                // the results array will equal ['one','two'] even though
-                if (err) {
-                  return console.log('load vizabi config files failed');
-                }
-                Vizabi._globals.metadata = JSON.parse(results[0]);
-                vizabiContext.model.language.strings.set(vizabiContext.model.language.id, JSON.parse(results[1]));
-                //set indicators
-                Vizabi._globals.metadata.indicatorsArray = ["gini", "gdp_per_cap", "u5mr"];
-                promise.resolve();
-              });
-            return promise;
-          });
+          electronUrl = path.join('file://', config.electronPath, 'chrome-app/data/gw') + '/';
         }
+
+        $scope.config = config;
+
+        var metadataContent = '';
+        var translationsContent = '';
 
         //last tab created
         $scope.lastTab = -1;
         $scope.tabs = [];
+        $scope.expertMode = false;
+        $scope.navCollapsed = false;
 
-        $scope.mode = 'default';
         $scope.ddf = {
-          url: 'https://raw.githubusercontent.com/valor-software/ddf--gapminder--systema_globalis/master',
-          // url: 'http://localhost:2000/ddf--sodertornsmodellen--testing2016',
+          url: '',
+          metadataUrl: '',
+          translationsUrl: '',
+          chromeExternalDdfPath: 'false',
           type: 'BubbleChart',
           types: [
             {value: 'BubbleChart', name: 'Bubble Chart'},
@@ -117,16 +55,14 @@ module.exports = function (app) {
           measures: [],
           dimensions: [],
           popup: false,
-          xAxis: '',
-          yAxis: '',
-          sizeAxis: '',
-          geoChart: 'geo.country',
-          geoColors: 'geo.world_4region',
-          // geoChart: 'geo.basomrade',
-          // geoColors: 'geo.kommun',
-          colorized: {},
-          currentTime: '2012',
-          endTime: '2017'
+          xAxis: 'income_per_person_gdppercapita_ppp_inflation_adjusted',
+          yAxis: 'life_expectancy_years',
+          sizeAxis: 'population_total',
+          startTime: "1990",
+          currentTime: '2015',
+          endTime: '2015',
+          expectedMeasuresQuery: '',
+          mainQuery: {}
         };
 
         $scope.loadingError = false;
@@ -139,64 +75,166 @@ module.exports = function (app) {
         $scope.favorites = {};
         $scope.selectedGraph = null;
 
+        $scope.defaults = function (cb) {
+          Ddf.chromeFs = null;
+          $scope.chromeFsRootPath = '';
+
+          if (config.isElectronApp) {
+            $scope.ddf.url = electronUrl + 'ddf';
+            $scope.ddf.metadataUrl = electronUrl + 'vizabi/metadata.json';
+            $scope.ddf.translationsUrl = electronUrl + 'vizabi/en.json';
+          }
+
+          if (config.isChromeApp && $scope.ddf.chromeExternalDdfPath === 'false') {
+            $scope.ddf.url = '../data/gw/ddf';
+            $scope.ddf.metadataUrl = '../data/gw/vizabi/metadata.json';
+            $scope.ddf.translationsUrl = '../data/gw/vizabi/en.json';
+          }
+
+          if (config.isChromeApp && $scope.ddf.chromeExternalDdfPath === 'true') {
+            $scope.ddf.url = 'ddf';
+            $scope.ddf.metadataUrl = 'vizabi/metadata.json';
+            $scope.ddf.translationsUrl = 'vizabi/en.json';
+          }
+
+          $scope.ddf.expectedMeasuresQuery = formatJson.plain(entitiesQueryTemplate);
+          $scope.ddf.mainQuery = {};
+          Object.keys(mainQueryTemplate).forEach(function (key) {
+            $scope.ddf.mainQuery[key] = formatJson.plain(mainQueryTemplate[key]);
+          });
+
+          if (config.isElectronApp || (config.isChromeApp && $scope.ddf.chromeExternalDdfPath === 'false')) {
+            $scope.loadMeasures();
+          }
+        };
+
         $scope.setTab = function (tabId) {
           //set current tab id and get current graph object
           $scope.currentTab = tabId;
           $scope.selectedGraph = _.findWhere($scope.tabs, {id: tabId}).graphName;
+          forceResizeEvt();
         };
 
-        $scope.openGraph = function (graphName) {
-          if ($scope.tabs.length === 0) {
-            //if there are no tabs - create one
-            $scope.newTab();
-          }
-          //render graph when tab is rendered
+        function forceResizeEvt() {
+          //force resize
           $timeout(function () {
-            var graph = $scope.graphs[graphName];
-            var tabIndex = $scope.tabs.map(function (el) {
-              return el.id;
-            }).indexOf($scope.currentTab);
-            $scope.tabs[tabIndex].graphName = graph.name;
-            $scope.selectedGraph = graph.name;
-            Vizabi._globals.gapminder_paths.baseUrl = '/';
-            renderGraph(graph);
+            var event = document.createEvent("HTMLEvents");
+            event.initEvent("resize", true, true);
+            event.eventName = "resize";
+            window.dispatchEvent(event);
           }, 0);
+        }
+
+        $scope.loadChromeFs = function () {
+          if (config.isChromeApp && $scope.ddf.chromeExternalDdfPath) {
+            chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function (entry) {
+              chrome.fileSystem.getDisplayPath(entry, function (path) {
+                Ddf.chromeFs = WebFS(entry);
+
+                safeApply($scope, function () {
+                  Ddf.reset();
+                  $scope.chromeFsRootPath = path;
+                  $scope.loadMeasures();
+                });
+              });
+            });
+          }
         };
 
-        $scope.loadDdf = function () {
-          ddfUtils.getDimensions($scope.ddf.url, function (err, result) {
+        $scope.hasChromeFs = function () {
+          return !!Ddf.chromeFs;
+        };
+
+        function areMeasuresBadForGo() {
+          function areMeasuresBadForGoForBubbleMap() {
+            return $scope.ddf.type === 'BubbleMap' && !$scope.ddf.sizeAxis;
+          }
+
+          function areMeasuresBadForGoForBubbleAndMountainCharts() {
+            return (($scope.ddf.type === 'BubbleChart' || $scope.ddf.type === 'MountainChart') &&
+            (!$scope.ddf.xAxis || !$scope.ddf.yAxis || !$scope.ddf.sizeAxis));
+          }
+
+          return areMeasuresBadForGoForBubbleMap() || areMeasuresBadForGoForBubbleAndMountainCharts();
+        }
+
+        function chromeAppIsBadForGo() {
+          return config.isChromeApp && $scope.ddf.chromeExternalDdfPath === 'true' && !$scope.hasChromeFs();
+        }
+
+        $scope.cantGo = function () {
+          return $scope.ddfError || areMeasuresBadForGo() || chromeAppIsBadForGo();
+        };
+
+        $scope.loadMeasures = function (cb) {
+          $scope.ddfError = '';
+          $scope.ddf.dimensions = [];
+          $scope.ddf.measures = [];
+
+          var query = {};
+          try {
+            query = JSON.parse($scope.ddf.expectedMeasuresQuery);
+          } catch (e) {
+            $scope.ddfError = e;
+          }
+
+          if ($scope.ddfError) {
+            return;
+          }
+
+          var ddf = new Ddf($scope.ddf.url);
+
+          ddf.getIndex(function (err) {
             if (err) {
-              console.log(err);
+              safeApply($scope, function () {
+                $scope.ddfError = 'Wrong DDF index: ' + err;
+              });
+
               return;
             }
 
-            $scope.ddf.dimensions = result;
-
-            ddfUtils.getMeasures($scope.ddf.url, function (err, result) {
+            ddf.getConceptsAndEntities(query, function (err, concepts) {
               if (err) {
-                console.log(err);
+                safeApply($scope, function () {
+                  $scope.ddfError = 'Wrong DDF concepts: ' + err;
+                });
+
                 return;
               }
 
-              $scope.ddf.measures = result.filter(function (v) {
-                return !!v.measure;
-              });
-
-              var s = $scope.ddf.geoColors.split('.');
-              ddfUtils.getData($scope.ddf.url, s[0], s[1], function (err, result) {
-                if (err) {
-                  console.log(err);
-                  return;
+              concepts.forEach(function (concept) {
+                if (concept.concept_type === 'measure') {
+                  $scope.ddf.measures.push(concept);
                 }
 
-                safeApply($scope, function () {
-                  $scope.ddf.colorized = {};
-                  result.forEach(function (r, i) {
-                    var c = getColorized(r[s[0]], i);
-                    $scope.ddf.colorized[c.key] = c.value;
+                if (concept.concept_type !== 'measure') {
+                  $scope.ddf.dimensions.push(concept);
+                }
+              });
+
+              var loader = Ddf.chromeFs ? chromeLoad : xhrLoad;
+
+              loader($scope.ddf.metadataUrl, function (metadata) {
+                loader($scope.ddf.translationsUrl, function (translations) {
+                  safeApply($scope, function () {
+                    $scope.ddfError = '';
+
+                    try {
+                      metadataContent = JSON.parse(metadata);
+                    } catch (e) {
+                      $scope.ddfError = 'Wrong JSON format for metadata: ' + e;
+                    }
+
+                    try {
+                      translationsContent = JSON.parse(translations);
+                    } catch (e) {
+                      $scope.ddfError += '\nWrong JSON format for translations: ' + e;
+                    }
+
+                    if (cb) {
+                      cb();
+                    }
                   });
-                  $scope.ddf.colorized['_default'] = "#ffb600";
-                  $scope.ddf.popup = true;
                 });
               });
             });
@@ -207,13 +245,47 @@ module.exports = function (app) {
           $scope.ddf.popup = false;
         };
 
+        function xhrLoad(path, cb) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', path, true);
+          xhr.onload = function () {
+            if (xhr.readyState === 4) {
+              if (xhr.status === 200) {
+                cb(xhr.responseText);
+              }
+            }
+          };
+          xhr.send(null);
+        }
+
+        function chromeLoad(path, cb) {
+          Ddf.chromeFs.readFile(path, '', function (err, file) {
+            if (err) {
+              console.log(err);
+            }
+
+            cb(file);
+          });
+        }
+
         $scope.openDdf = function () {
-          var queryObj = queryTemplate[$scope.ddf.type];
+          var queryObj = {};
+          $scope.ddfError = '';
+
+          try {
+            queryObj = JSON.parse($scope.ddf.mainQuery[$scope.ddf.type]);
+          } catch (e) {
+            $scope.ddfError = 'Wrong JSON format for main query';
+          }
+
+          if ($scope.ddfError) {
+            return;
+          }
+
           if ($scope.tabs.length === 0) {
-            //if there are no tabs - create one
             $scope.newTab();
           }
-          //render graph when tab is rendered
+
           $timeout(function () {
             var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
             if ($scope.ddf.type === 'BubbleChart' || $scope.ddf.type === 'MountainChart') {
@@ -224,108 +296,55 @@ module.exports = function (app) {
             }
 
             if ($scope.ddf.type === 'BubbleMap') {
+              queryObj.data.path = $scope.ddf.url;
               queryObj.state.marker.size.which = $scope.ddf.sizeAxis;
             }
 
-            var s = $scope.ddf.geoChart.split('.');
-            queryObj.state.entities.show['geo.cat'] = [s[1]];
-            queryObj.state.marker.color.palette = $scope.ddf.colorized;
-            queryObj.state.marker.color.which = $scope.ddf.geoColors;
+            queryObj.state.time.start = $scope.ddf.startTime;
             queryObj.state.time.end = $scope.ddf.endTime;
             queryObj.state.time.value = $scope.ddf.currentTime;
 
-            $scope.ddf.dimensions.forEach(function (dimension) {
-              var name = dimension.type === 'dimension' ?
-                dimension.concept : dimension.subdim_of + '.' + dimension.concept;
-              metadataTemplate.indicatorsDB[name] = {
-                allowCharts: ['*'],
-                use: 'property',
-                unit: '',
-                scales: ['ordinal'],
-                sourceLink: dimension.link || ''
-              };
-            });
-
-            var measuresPlain = [];
-            $scope.ddf.measures.forEach(function (measure) {
-              measuresPlain.push(measure.measure);
-              metadataTemplate.indicatorsDB[measure.measure] = {
-                allowCharts: ['mountainchart', 'bubblechart', 'bubblemap'],
-                use: 'indicator',
-                unit: measure.unit,
-                scales: ['linear'],
-                sourceLink: ''
-              };
-              // todo: temporary solution: consider real
-              metadataTemplate.indicatorsTree.children[2].children.push({
-                id: measure.measure
-              });
-
-              translationsTemplate['indicator/' + measure.measure] = measure.name;
-              translationsTemplate['unit/' + measure.unit] = measure.unit;
-            });
-
-            metadataTemplate.indicatorsDB._default = {
-              allowCharts: ['*'],
-              use: 'constant',
-              unit: '',
-              scales: ['ordinal'],
-              sourceLink: ''
-            };
-
-            var colorContains = [
-              {
-                obj: metadataTemplate.color.shades,
-                content: {
-                  "fill1": 0,
-                  "fill2": 1,
-                  "fill3": 2,
-                  "shade": 3,
-                  "print_fill": 4,
-                  "print_stroke": 5,
-                  "_default": 0
-                }
-              },
-              {
-                obj: metadataTemplate.color.selectable,
-                content: false
-              },
-              {
-                obj: metadataTemplate.indicatorsDB,
-                content: {
-                  "allowCharts": ["*"],
-                  "use": "property",
-                  "unit": "",
-                  "scales": ["ordinal"],
-                  "sourceLink": ""
-                }
-              }
-            ];
-            colorContains.forEach(function (o) {
-              o.obj[$scope.ddf.geoColors] = o.content;
-            });
-            metadataTemplate.indicatorsTree.children[1].children.push({id: $scope.ddf.geoColors});
-            metadataTemplate.color.palettes[$scope.ddf.geoColors] = $scope.ddf.colorized;
             $scope.ddf.popup = false;
 
+            if (config.isElectronApp) {
+              Vizabi._globals.ext_resources.host = electronUrl;
+              Vizabi._globals.ext_resources.preloadPath = '../../preview/data/';
+            }
+
             Vizabi.Tool.define('preload', function (promise) {
-              Vizabi._globals.metadata = metadataTemplate;
-              Vizabi._globals.metadata.indicatorsArray = measuresPlain;
-              this.model.language.strings.set(this.model.language.id, translationsTemplate);
+              Vizabi._globals.metadata = metadataContent;
+              this.model.language.strings.set(this.model.language.id, translationsContent);
               promise.resolve();
             });
 
             queryObj.data.ddfPath = $scope.ddf.url;
-
-            vizabiFactory.render($scope.ddf.type, placeholder, queryObj);
+            Vizabi($scope.ddf.type, placeholder, queryObj);
           }, 0);
         };
 
-        $scope.newTab = function () {
-          //create new tab and set current tab
+        $scope.newTab = function (withoutChart) {
           ++$scope.lastTab;
-          $scope.tabs.push({id: $scope.lastTab});
+
+          var tabName = $scope.ddf.types.find(function (type) {
+            return type.value === $scope.ddf.type;
+          }).name;
+
+          $scope.tabs.push({id: $scope.lastTab, tabName: tabName});
           $scope.setTab($scope.lastTab);
+
+          if (withoutChart !== false) {
+            $scope.loadMeasures(function () {
+              $scope.openDdf();
+            });
+          }
+        };
+
+        $scope.loadFolderOptions = function () {
+          $scope.navCollapsed = false;
+          $scope.newTab(false);
+          $scope.loadMeasures(function () {
+            $scope.ddf.popup = true;
+          });
         };
 
         $scope.closeTab = function (tabId) {
@@ -335,85 +354,7 @@ module.exports = function (app) {
           $scope.tabs = _.without($scope.tabs, _.findWhere($scope.tabs, {id: tabId}));
         };
 
-        $scope.addToFavorites = function (graphName) {
-          $scope.favorites[graphName] = $scope.graphs[graphName];
-          bookmarks.add($scope.graphs[graphName]);
-        };
-
-        $scope.removeFromFavorites = function (graphName) {
-          delete $scope.favorites[graphName];
-        };
-
-        //change location for the chrome and the electron apps
-        $scope.url = function (url) {
-          $location.path(url);
-        };
-
-        function renderGraph(graph) {
-          var placeholder = document.getElementById('vizabi-placeholder' + $scope.lastTab);
-          vizabiFactory.render(graph.tool, placeholder, graph.opts);
-        }
-
-        //compose test data for graphs
-        function getAvailableGraphsList(cb) {
-          var graphsHash = {};
-          var dataPath;
-          var geoPath;
-
-          //@todo: set paths to config
-          if (config.isElectronApp) {
-            var path = require('path');
-            dataPath = path.join(config.electronPath, 'client/src/public/data/data.csv');
-            geoPath = path.join(config.electronPath, 'client/src/public/data/geo.json');
-          } else if (config.isChromeApp) {
-            dataPath = chrome.runtime.getURL('data/graphs/');
-            geoPath = chrome.runtime.getURL('data/geo.json');
-          }
-
-          readerService.getGraphsList(function (err, graphsList) {
-            _.each(graphsList, function (graph) {
-              // get it from file name - ugly hack
-              if (!graph.name || !graph.name.match) {
-                return;
-              }
-
-              var m = graph.name.match(/\d+/);
-              if (!m || m.length < 1) {
-                return;
-              }
-
-              var year = m[0];
-
-              graphsHash[graph.name] = _.cloneDeep(queryForCsvReader);
-              graphsHash[graph.name].name = graph.name;
-              graphsHash[graph.name].opts.data.path = dataPath + graph.name;
-              graphsHash[graph.name].opts.data.geoPath = geoPath;
-              graphsHash[graph.name].opts.state.time.start = year;
-              graphsHash[graph.name].opts.state.time.end = year;
-              graphsHash[graph.name].opts.state.time.value = year;
-            });
-            cb(null, graphsHash);
-          });
-        }
-
-        function onInitFs(fs) {
-          config.fileSystem = fs;
-
-          getAvailableGraphsList(function (err, graphs) {
-            $scope.graphs = graphs;
-            $scope.safeApply();
-          });
-          readBookmarks();
-        }
-
-        function readBookmarks() {
-          bookmarks.getAll(function (err, bookmarks) {
-            if (err) {
-              return console.log('get bookmarks error', err);
-            }
-            $scope.favorites = bookmarks;
-            $scope.safeApply();
-          });
-        }
+        $scope.defaults();
+        $scope.newTab();
       }]);
 };

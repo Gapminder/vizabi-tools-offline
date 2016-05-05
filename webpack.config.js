@@ -11,19 +11,19 @@ var CompressionPlugin = require('compression-webpack-plugin');
 var bourbon = require('node-bourbon').includePaths;
 var _ = require('lodash');
 
+var isProduction = process.env.NODE_ENV === 'production';
+var isElectronApp = !!process.env.IS_ELECTRON_APP;
+
 var config = {
   template: 'index.html',
   index: 'index.html',
   src: './client/src',
   dest: './client/dist/tools',
-  publicPath: '/tools/'
+  publicPath: isElectronApp ? path.join(__dirname, '/client/dist/tools/') : '/tools/'
 };
 
 var chromeAppPaths = _.clone(config);
 chromeAppPaths.dest = './chrome-app/tools';
-
-var isProduction = process.env.NODE_ENV === 'production';
-var isElectronApp = process.env.IS_ELECTRON_APP;
 
 var absSrc = path.join(__dirname, config.src);
 var absDest = path.join(__dirname, config.dest);
@@ -41,6 +41,7 @@ var baseConfig = {
   },
   output: {
     path: absDest,
+    isElectronApp: isElectronApp,
     publicPath: isElectronApp ? './' : config.publicPath,
     filename: 'components/[name]-[hash:6].js',
     chunkFilename: 'components/[name]-[hash:6].js'
@@ -57,11 +58,7 @@ var baseConfig = {
         test: /vizabi\.js/,
         loader: 'imports?this=>window,d3'
       },
-      {
-        test: /\.scss/,
-        //loader: 'style!css!sass?includePaths[]=' + bourbon
-        loader: ExtractTextPlugin.extract('style-loader', 'css-loader?sourceMap&root=' + absSrc + '!sass-loader?includePaths[]=' + bourbon)
-      },
+      {test: /\.styl$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader!stylus-loader')},
       {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract('style-loader', 'css-loader?sourceMap&root=' + absSrc)
@@ -100,7 +97,7 @@ var baseConfig = {
       }
     ]
   },
-  stats: {colors: true, progress: true, children: false},
+  stats: {colors: true, progress: true, children: true},
   target: isElectronApp ? 'atom' : 'web'
 };
 
@@ -121,7 +118,7 @@ var wOptions = {
     }),
     new HtmlWebpackPlugin({
       filename: 'electronIndex.html',
-      template: path.join(config.src, 'electronIndex.html'),
+      template: path.join(config.src, 'index.html'),
       chunks: ['angular', 'vizabi-tools', 'ga'],
       minify: true
     }),
