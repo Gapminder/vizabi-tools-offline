@@ -17,10 +17,10 @@ User guide for this solution is [here](doc/user-guide.md)
   * click `Load unpacked extension…` to pop up a file-selection dialog.
   * Navigate to the directory in which your the unzipped files live, and select it(edited)
 
-### How to build the Electron app
+### How to build the Chrome app
  * `npm run build-chrome`
 
-### How to run the Electron app for development
+### How to build the Electron app
   * `npm run build`
 
 Zip archives with expected versions will be placed to root folder of the project.
