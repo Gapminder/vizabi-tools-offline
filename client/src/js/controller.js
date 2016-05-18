@@ -27,7 +27,7 @@ module.exports = function (app) {
         var electronUrl = '';
 
         if (config.isElectronApp) {
-          electronUrl = path.join('file://', config.electronPath, 'chrome-app/data/gw') + '/';
+          electronUrl = path.join('file://', process.resourcesPath.replace(/\\%20/g, ' '), 'app/chrome-app/data/gw') + '/';
         }
 
         $scope.config = config;

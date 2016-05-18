@@ -10,9 +10,14 @@ module.exports = function (app) {
   };
 
   if (isElectronApp) {
-    var remote = require('remote');
-    var electronApp = remote.require('app');
-    config.electronPath = electronApp.getAppPath()
+    //var remote = require('remote');
+    //var electronApp = remote.require('app');
+    //var remote = window.require('electron').remote;
+    //var electronApp = remote.require('app');
+    //config.electronPath = electronApp.getAppPath();
+    //var electron = require('electron');
+    //var app = electron.app;
+    //console.log('!!!!!', app.getAppPath());
   }
 
   app

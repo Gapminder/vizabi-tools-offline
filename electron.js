@@ -1,49 +1,81 @@
-var app = require('app');  // Module to control application life.
-//var ipc = require('ipc');
-var BrowserWindow = require('browser-window');  // Module to create native browser window.
-//require('electron-cookies');
+var electron = require('electron');
+var fs = require('fs');
+var app = electron.app;
+var autoUpdater = electron.autoUpdater;
+var BrowserWindow = electron.BrowserWindow;
+var ipc = electron.ipcMain;
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-var mainWindow = null;
-
-// Quit when all windows are closed.
-app.on('window-all-closed', function() {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform != 'darwin') {
-    app.quit();
-  }
-});
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.on('ready', function() {
-  // Create the browser window.
+function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    icon: 'file://' +__dirname + '/client/dist/tools/favicon.ico',
-    'min-width': 800,
-    'min-height': 200,
-    'accept-first-mouse': true
+    icon: 'file://' + __dirname + '/client/dist/tools/favicon.ico',
+    minWidth: 800,
+    minHeight: 200,
+    acceptFirstMouse: true
   });
 
-  // and load the index.html of the app.
-  mainWindow.loadUrl('file://' + __dirname + '/client/dist/tools/index.html');
+  mainWindow.loadURL('file://' + __dirname + '/client/dist/tools/index.html');
 
-  // Open the DevTools.
-  if (process.env.NODE_ENV === 'development') {
+  //if (process.env.NODE_ENV === 'development') {
     mainWindow.openDevTools();
-  }
+  //}
 
-  mainWindow.focus();
+  //mainWindow.focus();
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
+  mainWindow.on('closed', function () {
     mainWindow = null;
   });
+}
+
+function notify(title, message) {
+  var windows = BrowserWindowElectron.getAllWindows();
+
+  if (windows.length == 0) {
+    return
+  }
+
+  windows[0].webContents.send("notify", title, message);
+}
+
+var mainWindow = null;
+
+app.on('ready', createWindow);
+
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
 });
+
+app.on('activate', function () {
+  if (mainWindow === null) {
+    createWindow();
+  }
+});
+
+const version = app.getVersion();
+
+autoUpdater.addListener("update-available", function () {
+  console.log("A new update is available");
+});
+
+autoUpdater.addListener("update-downloaded", function (event, releaseNotes, releaseName, releaseDate, updateURL) {
+  notify("A new update is ready to install", 'Version '+releaseName+' is downloaded and will be automatically installed on Quit');
+});
+
+autoUpdater.addListener("error", function (error) {
+  console.log(error);
+});
+
+autoUpdater.addListener("checking-for-update", function (event) {
+  console.log("checking-for-update");
+});
+
+autoUpdater.addListener("update-not-available", function () {
+  console.log("update-not-available");
+});
+
+autoUpdater.setFeedURL('http://127.0.0.1:8080/Vizabi Offline-linux-x64.zip');
+
+autoUpdater.quitAndInstall();
