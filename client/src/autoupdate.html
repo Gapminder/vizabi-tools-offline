@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+    {% if (!o.webpackConfig.output.isElectronApp) { %}
+    <base href = "/tools/">
+    {% } %}
+    <title>Gapminder Offline</title>
+    <meta charset = "utf-8">
+    <meta name = "viewport" content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    {% for (var prop in o.htmlWebpackPlugin.files.css) { %}
+    <link href = "{%= o.htmlWebpackPlugin.files.css[prop] %}" rel = "stylesheet" type = "text/css">
+    {% } %}
+    <link href = "./favicon.ico" rel = "shortcut icon">
+    <style>
+        .centered {
+            position: fixed;
+            top: 30%;
+            left: 30%;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .inst_list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .inst_list li {
+            padding-left: 1em;
+            text-indent: -.7em;
+        }
+
+        .inst_list li:before {
+            content: "\e008";
+            color: #999;
+            margin-right: 4px;
+        }
+
+        li.current::before {
+            content: "\e008";
+            color: #f9cc3e;
+            margin-right: 4px;
+        }
+
+        li.done::before {
+            content: "\e008";
+            color: green;
+            margin-right: 4px;
+        }
+
+        li.fail::before {
+            content: "\e008";
+            color: red;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+<div class = "wrapper">
+    <div class = "header">
+        <a class = "header-title" href = "http://www.gapminder.org">
+            GAPMINDER TOOLS
+        </a>
+    </div>
+    <div class = "centered">
+        <div class = "column main">
+            <div id = "version-desc" style = "margin-bottom: 50px;"> </div>
+            <div id = "question">
+                <div>Do you want to update?</div>
+                <input type = "button" value = "Yes" onclick = "yes()">
+                <input type = "button" value = "No" onclick = "no()">
+            </div>
+            <div id = "flow" style = "display: none;">
+                <ul class = "inst_list">
+                    <li id = "start">Start</li>
+                    <li id = "download">Download update</li>
+                    <li id = "unpack">Unpack</li>
+                </ul>
+            </div>
+
+            <div id = "restart" style = "display: none; margin-top: 50px;">
+                <input type = "button" value = "Restart" onclick = "restart()">
+            </div>
+            <div id = "restart-prev" style = "display: none; margin-top: 50px;">
+                <input type = "button" value = "Restart" onclick = "restartPrev()">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var versionContainer = document.getElementById('version-desc');
+    var questionContainer = document.getElementById('question');
+    var flowContainer = document.getElementById('flow');
+    var startStepEl = document.getElementById('start');
+    var downloadStepEl = document.getElementById('download');
+    var unpackStepEl = document.getElementById('unpack');
+    var restartContainer = document.getElementById('restart');
+    var ipc = require('ipc');
+
+    ipc.on('show-version', function (data) {
+        versionContainer.innerHTML = 'Your current version is <i>' + data.current + '</i>.<br>' +
+                'Latest version is <b>' + data.latest + '<b>';
+    });
+
+    ipc.on('update-data', function (data) {
+
+        if (data.indexOf('#start-download@ok') >= 0) {
+            startStepEl.className = 'done';
+            downloadStepEl.className = 'current';
+        }
+        if (data.indexOf('#finish-download@fail') >= 0) {
+            downloadStepEl.className = 'fail';
+        }
+        if (data.indexOf('#finish-download@ok') >= 0) {
+            downloadStepEl.className = 'done';
+            unpackStepEl.className = 'current';
+        }
+        if (data.indexOf('#unpack@fail') >= 0) {
+            unpackStepEl.className = 'fail';
+        }
+        if (data.indexOf('#unpack@ok') >= 0) {
+            unpackStepEl.className = 'done';
+        }
+    });
+
+    ipc.on('show-restart', function () {
+        restartContainer.style.display = 'block';
+    });
+
+    function yes() {
+        questionContainer.style.display = 'none';
+        flowContainer.style.display = 'block';
+        ipc.send('update-yes');
+    }
+
+    function no() {
+        ipc.send('update-no');
+    }
+
+    function restart() {
+        ipc.send('restart');
+    }
+
+    function restartPrev() {
+        ipc.send('restart-prev');
+    }
+</script>
+</body>
+</html>

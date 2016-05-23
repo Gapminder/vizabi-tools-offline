@@ -49,7 +49,7 @@ var baseConfig = {
   resolve: {
     root: [absSrc],
     modulesDirectories: ['./components', 'node_modules'],
-    extensions: ['', '.js', '.png', '.gif', '.jpg', '.json']
+    extensions: ['', '.js', 'json', '.png', '.gif', '.jpg', '.cur']
   },
   module: {
     //noParse: new RegExp(require.resolve("vizabi"), 'ig'),
@@ -65,7 +65,7 @@ var baseConfig = {
         //loader: 'style!css'//?root=' + absSrc
       },
       {
-        test: /.*\.(gif|png|jpe?g)$/i,
+        test: /.*\.(gif|png|jpe?g|cur)$/i,
         loaders: [
           'file?hash=sha512&digest=hex&name=[path][name].[ext]',
           'image-webpack?{progressive:true, optimizationLevel: 7, interlaced: false, pngquant:{quality: "65-90", speed: 4}}'
@@ -120,6 +120,12 @@ var wOptions = {
       filename: 'electronIndex.html',
       template: path.join(config.src, 'index.html'),
       chunks: ['angular', 'vizabi-tools', 'ga'],
+      minify: true
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'autoupdate.html',
+      template: path.join(config.src, 'autoupdate.html'),
+      chunks: ['angular', 'vizabi-tools'],
       minify: true
     }),
     new HtmlWebpackPlugin({
