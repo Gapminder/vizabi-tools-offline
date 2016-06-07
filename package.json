@@ -1,6 +1,6 @@
 {
   "name": "GapminderOffline",
-  "version": "0.13.5",
+  "version": "0.13.11-2",
   "description": "Gapminder Offline",
   "repository": {
     "type": "git",
@@ -11,24 +11,24 @@
   "scripts": {
     "build-chrome": "NODE_ENV=development webpack",
     "clean": "rm -rf ./dist",
-    "build": "npm run clean && npm run build:osx && npm run build:win && npm run build:linux",
-    "build:osx": "scripts/build-macos.js \"Vizabi Offline\" \"Gapminder\" 0.1.0 2016",
-    "build:win": "scripts/build-win.js \"Vizabi Offline\" \"Gapminder\" 0.1.0 2016",
-    "build:linux": "scripts/build-linux.js \"Vizabi Offline\" \"Gapminder\" 0.1.0 2016"
+    "build": "npm run clean && npm run build:linux && npm run build:osx && npm run build:win",
+    "build:osx": "scripts/build-macos.js \"Gapminder Offline\" \"Gapminder\" 0.13.11-2 2016",
+    "build:win": "scripts/build-win.js \"Gapminder Offline\" \"Gapminder\" 0.13.11-2 2016",
+    "build:linux": "scripts/build-linux.js \"Gapminder Offline\" \"Gapminder\" 0.13.11-2 2016"
   },
+  "files": [
+    "bin"
+  ],
   "build": {
     "app-bundle-id": "org.develar.onshape",
     "app-category-type": "public.app-category.graphics-design",
     "osx": {
-      "title": "Vizabi Offline",
       "icon": "./build/icon.icns"
     },
     "win": {
-      "title": "Vizabi Offline",
       "icon": "./build/icon.ico"
     },
     "linux": {
-      "title": "Vizabi Offline",
       "icon": "./build/icon.ico"
     }
   },
@@ -54,27 +54,17 @@
     "webpack-dev-server": "1.12.1"
   },
   "dependencies": {
-    "URLON": "1.0.1",
     "angular": "1.4.7",
     "angular-route": "1.4.7",
     "angular-touch": "1.4.7",
-    "async": "1.5.0",
-    "body-parser": "1.14.1",
-    "bourbon": "4.2.6",
-    "compression": "1.6.0",
-    "connect-gzip-static": "1.0.0",
     "d3": "3.5.6",
     "electron-prebuilt": "0.37.5",
-    "express": "4.13.3",
-    "express-redis-cache": "0.1.8",
+    "electron-update-checker": "0.1.0",
     "format-json": "1.0.3",
     "lodash": "3.10.1",
-    "method-override": "2.3.5",
-    "mongoose": "4.1.12",
-    "morgan": "1.6.1",
-    "node-bourbon": "4.2.3",
-    "redis": "2.2.5",
-    "vizabi": "0.13.8-25",
+    "node-bourbon": "4.2.8",
+    "shelljs": "0.6.0",
+    "vizabi": "0.13.11-2",
     "web-fs": "2.1.0"
   }
 }

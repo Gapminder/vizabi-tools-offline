@@ -1,3 +1,6 @@
+var electron = window.require('electron');
+var remote = electron.remote;
+
 module.exports = function (app) {
   var isElectronApp = (typeof _isElectronApp !== 'undefined' && _isElectronApp === true);
   var isChromeApp = !!(typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest);
@@ -10,7 +13,7 @@ module.exports = function (app) {
   };
 
   if (isElectronApp) {
-    var remote = require('remote');
+    //var remote = require('remote');
     var electronApp = remote.require('app');
     config.electronPath = electronApp.getAppPath()
   }

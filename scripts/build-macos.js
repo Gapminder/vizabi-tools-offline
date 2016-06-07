@@ -6,23 +6,29 @@ var companyName = process.argv[3];
 var versionLabel = process.argv[4];
 var yearLabel = process.argv[5];
 
-var command = 'rm -rf ./dist/osx && rm -rf ./dist/GapminderOffline-darwin-x64 && ' +
+var command = 'npm i && rm -rf ./dist/darwin && rm -rf "./dist/Gapminder Offline-darwin-x64" && ' +
   'IS_ELECTRON_APP=true webpack && ./node_modules/.bin/electron-packager . "' + productName + '" ' +
-  '--out=dist/osx ' +
+  '--out=dist/darwin ' +
   '--platform=darwin ' +
   '--arch=x64 ' +
   '--version=0.37.5 ' +
-  '--icon=build/icon.icns ' +
+  '--icon=build/icon.ico ' +
   '--ignore="(.zip|node_modules/.bin|node_modules/electron-builder|pack.json|README.md)" ' +
-  'app-version=' + versionLabel + ' ' +
-  '--asar  ' +
+  'app-version="' + versionLabel + '" ' +
   '--version-string.CompanyName="' + companyName + '" ' +
   '--version-string.ProductName="' + productName + '" ' +
   '--version-string.FileVersion="' + versionLabel + '" ' +
   '--version-string.ProductVersion="' + versionLabel + '" ' +
   '--version-string.LegalCopyright="© ' + companyName + ', ' + yearLabel + '" && ' +
-  './node_modules/.bin/build "dist/osx/' + productName + '/' + productName + '.app" --platform=osx &&' +
-  'cd  "./dist/osx" && zip --symlinks -r "../../Vizabi Offline-darwin-x64.zip" "./Vizabi Offline-darwin-x64" && ' +
-  'rm -rf ../osx && rm -rf ../GapminderOffline-darwin-x64';
+  'cp ./updater-darwin "./dist/darwin/Gapminder Offline-darwin-x64" && ' +
+  'cp ./run-darwin "./dist/darwin/Gapminder Offline-darwin-x64" && ' +
+  './node_modules/.bin/build "dist/darwin/' + productName + '" --platform=darwin &&' +
+  'rm -rf ./node_modules/* && '+
+  'cd  "./dist/darwin" && ' +
+  'npm i --production && ' +
+  'rm -rf "./Gapminder Offline-darwin-x64/Gapminder Offline.app/Contents/Resources/app/node_modules" && ' +
+  'cp -r ../../node_modules "./Gapminder Offline-darwin-x64/Gapminder Offline.app/Contents/Resources/app/" && ' +
+  'zip --symlinks -r "../../GapminderOffline-darwin.zip" "./Gapminder Offline-darwin-x64" && ' +
+  'rm -rf ../darwin && rm -rf "../GapminderOffline-darwin-x64"';
 
 shell.exec(command);

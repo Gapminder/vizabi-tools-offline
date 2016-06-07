@@ -1,0 +1,3 @@
+\cp -r ./cache/Gapminder\ Offline-linux-x64/* .
+rm -rf ./cache
+./Gapminder\ Offline

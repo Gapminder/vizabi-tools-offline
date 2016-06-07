@@ -1,5 +1,5 @@
 exports.entitiesQueryTemplate = {
-  select: ["geo", "geo.name", "geo.geographic_regions_in_4_colors"],
+  select: ["geo", "geo.name", "geo.world_4region"],
   where: {"geo.is--country": true}
 };
 
@@ -36,6 +36,48 @@ exports.mainQueryTemplate = {
         },
         color: {
           use: "property",
+          palette: {
+            asia: [
+              "#ff5872",
+              "#ff5178",
+              "#ff658a",
+              "#da0025",
+              "#fa4e73",
+              "#b2043a"
+            ],
+            europe: [
+              "#ffe700",
+              "#fbdd00",
+              "#fff400",
+              "#fbaf09",
+              "#ffe700",
+              "#b17f4a"
+            ],
+            americas: [
+              "#7feb00",
+              "#5de200",
+              "#81f201",
+              "#00b900",
+              "#b5ea32",
+              "#008d36"
+            ],
+            africa: [
+              "#00d5e9",
+              "#00c8ec",
+              "#00e1ec",
+              "#0098df",
+              "#77dff7",
+              "#0586c6"
+            ],
+            _default: [
+              "#ffb600",
+              "#ffaa14",
+              "#ffc500",
+              "#fb6d19",
+              "#ffb600",
+              "#9b4838"
+            ]
+          },
           which: "geo.world_4region", //
           scaleType: "ordinal",
           allow: {names: ["!geo.name"]}
@@ -134,6 +176,48 @@ exports.mainQueryTemplate = {
         },
         color: {
           use: "property",
+          palette: {
+            asia: [
+              "#ff5872",
+              "#ff5178",
+              "#ff658a",
+              "#da0025",
+              "#fa4e73",
+              "#b2043a"
+            ],
+            europe: [
+              "#ffe700",
+              "#fbdd00",
+              "#fff400",
+              "#fbaf09",
+              "#ffe700",
+              "#b17f4a"
+            ],
+            americas: [
+              "#7feb00",
+              "#5de200",
+              "#81f201",
+              "#00b900",
+              "#b5ea32",
+              "#008d36"
+            ],
+            africa: [
+              "#00d5e9",
+              "#00c8ec",
+              "#00e1ec",
+              "#0098df",
+              "#77dff7",
+              "#0586c6"
+            ],
+            _default: [
+              "#ffb600",
+              "#ffaa14",
+              "#ffc500",
+              "#fb6d19",
+              "#ffb600",
+              "#9b4838"
+            ]
+          },
           which: "geo.world_4region",
           scaleType: "ordinal",
           allow: {
@@ -205,6 +289,48 @@ exports.mainQueryTemplate = {
         },
         color: {
           use: "property",
+          palette: {
+            asia: [
+              "#ff5872",
+              "#ff5178",
+              "#ff658a",
+              "#da0025",
+              "#fa4e73",
+              "#b2043a"
+            ],
+            europe: [
+              "#ffe700",
+              "#fbdd00",
+              "#fff400",
+              "#fbaf09",
+              "#ffe700",
+              "#b17f4a"
+            ],
+            americas: [
+              "#7feb00",
+              "#5de200",
+              "#81f201",
+              "#00b900",
+              "#b5ea32",
+              "#008d36"
+            ],
+            africa: [
+              "#00d5e9",
+              "#00c8ec",
+              "#00e1ec",
+              "#0098df",
+              "#77dff7",
+              "#0586c6"
+            ],
+            _default: [
+              "#ffb600",
+              "#ffaa14",
+              "#ffc500",
+              "#fb6d19",
+              "#ffb600",
+              "#9b4838"
+            ]
+          },
           which: "geo.world_4region",
           scaleType: "ordinal",
           allow: {
