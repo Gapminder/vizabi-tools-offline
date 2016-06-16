@@ -233,6 +233,10 @@ Ddf.prototype.getEntities = function (query, cb) {
     entityActions.push(load(fileName));
   });
 
+  if (entityActions.length <= 0) {
+    return cb();
+  }
+
   // secondly we should get entities
   Promise.all(entityActions).then(function () {
     var _entities = [];

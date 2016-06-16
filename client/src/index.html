@@ -4,7 +4,7 @@
   {% if (!o.webpackConfig.output.isElectronApp) { %}
   <base href="/tools/">
   {% } %}
-  <title>Gapminder Offline 0.13.11-2</title>
+  <title>Gapminder Offline 0.14.0-10</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   {% for (var prop in o.htmlWebpackPlugin.files.css) { %}
@@ -34,7 +34,7 @@
     </ul>
     <button class="add-tab" ng-click="newTab()">+</button>
 
-    <div class="pre-popup" ng-if="ddf.popup === true">
+    <div class="pre-popup" ng-if="ddf.popup === true" style="z-index: 99999 ! important">
 
       <div class="popup-block">
         <select ng-model="ddf.type">
@@ -79,21 +79,21 @@
       <div ng-if="ddf.type === 'BubbleChart' || ddf.type === 'MountainChart'">
         <div class="popup-block">
           X axis:
-          <select ng-model="ddf.xAxis" ng-disabled="ddf.measures.length < 1">
+          <select ng-model="ddf.xAxis" ng-disabled="ddf.measures.length < 1 || ddf.progress === true">
             <option value="">choose measure</option>
             <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
         <div class="popup-block">
           Y axis:
-          <select ng-model="ddf.yAxis" ng-disabled="ddf.measures.length < 1">
+          <select ng-model="ddf.yAxis" ng-disabled="ddf.measures.length < 1 || ddf.progress === true">
             <option value="">choose measure</option>
             <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
         </div>
         <div class="popup-block">
           Size axis:
-          <select ng-model="ddf.sizeAxis" ng-disabled="ddf.measures.length < 1">
+          <select ng-model="ddf.sizeAxis" ng-disabled="ddf.measures.length < 1 || ddf.progress === true">
             <option value="">choose measure</option>
             <option ng-repeat="axis in ddf.measures" value="{{axis.concept}}">{{axis.name}}</option>
           </select>
@@ -119,10 +119,22 @@
       <div class="popup-footer">
 
         <input type="button"
-               ng-disabled="cantGo()"
+               ng-disabled="cantGo() || ddf.progress === true"
                ng-click="openDdf()"
                value="Go" />
         <input type="button" ng-click="closeDdf()" value="Close" />
+      </div>
+    </div>
+
+    <div class="pre-popup" ng-if="ddf.diagnostic === true" style="z-index: 99999 ! important">
+      <div>Metadata</div>
+      <textarea cols="80" rows="5">{{metadata}}</textarea>
+      <div>Translations</div>
+      <textarea cols="80" rows="5">{{translations}}</textarea>
+      <div>Error</div>
+      <textarea cols="80" rows="5">{{ddfError}}</textarea>
+      <div class="popup-footer">
+        <input type="button" ng-click="closeDiagnostic()" value="Close" />
       </div>
     </div>
 
@@ -136,6 +148,7 @@
       <li style="color: grey">Look for updates</li>
       <li style="color: grey">Provide feedback</li>
       <li><a href ng-click="loadFolderOptions()">Load DDF folder option</a></li>
+      <li><a href ng-click="openDiagnostic()">Diagnostic</a></li>
     </ul>
 
   </div>
