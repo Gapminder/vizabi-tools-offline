@@ -293,8 +293,6 @@ module.exports = function (app) {
                   metadataContent = metadata;
                   translationsContent = translations;
 
-                  console.log(JSON.stringify(metadataContent));
-
                   if (cb) {
                     cb();
                   }
