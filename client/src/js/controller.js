@@ -4,6 +4,7 @@ var _ = require('lodash');
 var path = require('path');
 var formatJson = require('format-json');
 var WebFS = require('web-fs');
+var MetadataGenerator = require('vizabi-metadata-generator').MetadataGenerator;
 
 var ddfLib = require('./vizabi-ddf');
 var Ddf = ddfLib.Ddf;
@@ -16,6 +17,68 @@ function safeApply(scope, fn) {
     scope.$eval(fn);
   } else {
     scope.$apply(fn);
+  }
+}
+
+function prepareMetadataByFiles(metadataUrl, translationsUrl) {
+  return function (cb) {
+    var loader = Ddf.chromeFs ? chromeLoad : xhrLoad;
+
+    loader(metadataUrl, function (metadata) {
+      loader(translationsUrl, function (translations) {
+        var ddfError = '';
+        var metadataContent = null;
+        var translationsContent = null;
+
+        try {
+          metadataContent = JSON.parse(metadata);
+        } catch (e) {
+          ddfError = 'Wrong JSON format for metadata: ' + e;
+        }
+
+        try {
+          translationsContent = JSON.parse(translations);
+        } catch (e) {
+          ddfError += '\nWrong JSON format for translations: ' + e;
+        }
+
+        cb(ddfError, metadataContent, translationsContent);
+      });
+    });
+  };
+}
+
+function xhrLoad(path, cb) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', path, true);
+  xhr.onload = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        cb(xhr.responseText);
+      }
+    }
+  };
+  xhr.send(null);
+}
+
+function chromeLoad(path, cb) {
+  Ddf.chromeFs.readFile(path, '', function (err, file) {
+    if (err) {
+      console.log(err);
+    }
+
+    cb(file);
+  });
+}
+
+function prepareMetadataOnFly(ddfUrl) {
+  return function (cb) {
+    var metadataGenerator = new MetadataGenerator(ddfUrl.replace(/^file:/, ''));
+    console.log(ddfUrl.replace(/^file:/, ''));
+
+    metadataGenerator.generate(function (err, metadataDescriptor) {
+      cb(err, metadataDescriptor.metadata, metadataDescriptor.translations);
+    });
   }
 }
 
@@ -55,6 +118,7 @@ module.exports = function (app) {
           measures: [],
           dimensions: [],
           popup: false,
+          diagnostic: false,
           xAxis: 'income_per_person_gdppercapita_ppp_inflation_adjusted',
           yAxis: 'life_expectancy_years',
           sizeAxis: 'population_total',
@@ -212,29 +276,26 @@ module.exports = function (app) {
                 }
               });
 
-              var loader = Ddf.chromeFs ? chromeLoad : xhrLoad;
+              var metadataLoader =
+                !$scope.ddf.metadataUrl.trim() ? prepareMetadataOnFly($scope.ddf.url) :
+                  prepareMetadataByFiles($scope.ddf.metadataUrl, $scope.ddf.translationsUrl);
 
-              loader($scope.ddf.metadataUrl, function (metadata) {
-                loader($scope.ddf.translationsUrl, function (translations) {
-                  safeApply($scope, function () {
-                    $scope.ddfError = '';
+              $scope.ddf.progress = true;
+              metadataLoader(function (error, metadata, translations) {
+                safeApply($scope, function () {
+                  $scope.ddf.progress = false;
 
-                    try {
-                      metadataContent = JSON.parse(metadata);
-                    } catch (e) {
-                      $scope.ddfError = 'Wrong JSON format for metadata: ' + e;
-                    }
+                  if (error) {
+                    $scope.ddfError = error;
+                    return;
+                  }
 
-                    try {
-                      translationsContent = JSON.parse(translations);
-                    } catch (e) {
-                      $scope.ddfError += '\nWrong JSON format for translations: ' + e;
-                    }
+                  metadataContent = metadata;
+                  translationsContent = translations;
 
-                    if (cb) {
-                      cb();
-                    }
-                  });
+                  if (cb) {
+                    cb();
+                  }
                 });
               });
             });
@@ -244,29 +305,6 @@ module.exports = function (app) {
         $scope.closeDdf = function () {
           $scope.ddf.popup = false;
         };
-
-        function xhrLoad(path, cb) {
-          var xhr = new XMLHttpRequest();
-          xhr.open('GET', path, true);
-          xhr.onload = function () {
-            if (xhr.readyState === 4) {
-              if (xhr.status === 200) {
-                cb(xhr.responseText);
-              }
-            }
-          };
-          xhr.send(null);
-        }
-
-        function chromeLoad(path, cb) {
-          Ddf.chromeFs.readFile(path, '', function (err, file) {
-            if (err) {
-              console.log(err);
-            }
-
-            cb(file);
-          });
-        }
 
         $scope.openDdf = function () {
           var queryObj = {};
@@ -317,6 +355,10 @@ module.exports = function (app) {
               promise.resolve();
             });
 
+            $scope.vizabiQuery = queryObj;
+            $scope.metadata = metadataContent;
+            $scope.translations = translationsContent;
+
             queryObj.data.ddfPath = $scope.ddf.url;
             Vizabi($scope.ddf.type, placeholder, queryObj);
           }, 0);
@@ -345,6 +387,15 @@ module.exports = function (app) {
           $scope.loadMeasures(function () {
             $scope.ddf.popup = true;
           });
+        };
+
+        $scope.openDiagnostic = function () {
+          $scope.navCollapsed = false;
+          $scope.ddf.diagnostic = true;
+        };
+
+        $scope.closeDiagnostic = function () {
+          $scope.ddf.diagnostic = false;
         };
 
         $scope.closeTab = function (tabId) {

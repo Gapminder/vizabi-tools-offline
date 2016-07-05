@@ -92,7 +92,7 @@ exports.mainQueryTemplate = {
       }
     },
     data: {
-      reader: "ddf1csv",
+      reader: "ddf1csv2",
       splash: false
     },
     language: {id: "en", strings: {}},
