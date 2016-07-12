@@ -5,7 +5,7 @@ var angular = require('angular');
 var ngRoute = require('angular-route');
 var ngTouch = require('angular-touch');
 
-require('./vizabi-ddf-csv-reader');
+require('vizabi/build/dist/vizabi.css');
 var app = angular.module('gapminderTools', [ngRoute, ngTouch], ['$provide', function($provide) {
 }]);
 

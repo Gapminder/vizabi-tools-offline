@@ -92,7 +92,7 @@ exports.mainQueryTemplate = {
       }
     },
     data: {
-      reader: "ddf1csv2",
+      reader: "ddf1-csv-ext",
       splash: false
     },
     language: {id: "en", strings: {}},
@@ -238,7 +238,7 @@ exports.mainQueryTemplate = {
     },
     language: {id: "en", strings: {}},
     data: {
-      reader: "ddf1csv",
+      reader: "ddf1-csv-ext",
       splash: false
     },
     ui: {
@@ -341,7 +341,7 @@ exports.mainQueryTemplate = {
     },
     language: {id: "en", strings: {}},
     data: {
-      reader: "ddf1csv",
+      reader: "ddf1-csv-ext",
       splash: false
     },
     ui: {
