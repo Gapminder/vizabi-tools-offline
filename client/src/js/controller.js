@@ -1,4 +1,8 @@
 var Vizabi = require('vizabi');
+var Ddf = require('vizabi-ddfcsv-reader').Ddf;
+var DDFCSVReader = require('vizabi-ddfcsv-reader').DDFCSVReader;
+var ChromeFileReader = require('vizabi-ddfcsv-reader').ChromeFileReader;
+var FrontendFileReader = require('vizabi-ddfcsv-reader').FrontendFileReader;
 var async = require('async');
 var _ = require('lodash');
 var path = require('path');
@@ -6,10 +10,11 @@ var formatJson = require('format-json');
 var WebFS = require('web-fs');
 var MetadataGenerator = require('vizabi-metadata-generator').MetadataGenerator;
 
-var ddfLib = require('./vizabi-ddf');
-var Ddf = ddfLib.Ddf;
 var mainQueryTemplate = require('./templates/query').mainQueryTemplate;
 var entitiesQueryTemplate = require('./templates/query').entitiesQueryTemplate;
+var ddfExtra = {
+  chromeFs: null
+};
 
 function safeApply(scope, fn) {
   var phase = scope.$root.$$phase;
@@ -22,7 +27,7 @@ function safeApply(scope, fn) {
 
 function prepareMetadataByFiles(metadataUrl, translationsUrl) {
   return function (cb) {
-    var loader = Ddf.chromeFs ? chromeLoad : xhrLoad;
+    var loader = ddfExtra.chromeFs ? chromeLoad : xhrLoad;
 
     loader(metadataUrl, function (metadata) {
       loader(translationsUrl, function (translations) {
@@ -62,7 +67,7 @@ function xhrLoad(path, cb) {
 }
 
 function chromeLoad(path, cb) {
-  Ddf.chromeFs.readFile(path, '', function (err, file) {
+  ddfExtra.chromeFs.readFile(path, '', function (err, file) {
     if (err) {
       console.log(err);
     }
@@ -140,7 +145,7 @@ module.exports = function (app) {
         $scope.selectedGraph = null;
 
         $scope.defaults = function (cb) {
-          Ddf.chromeFs = null;
+          ddfExtra.chromeFs = null;
           $scope.chromeFsRootPath = '';
 
           if (config.isElectronApp) {
@@ -193,10 +198,10 @@ module.exports = function (app) {
           if (config.isChromeApp && $scope.ddf.chromeExternalDdfPath) {
             chrome.fileSystem.chooseEntry({type: 'openDirectory'}, function (entry) {
               chrome.fileSystem.getDisplayPath(entry, function (path) {
-                Ddf.chromeFs = WebFS(entry);
+                ddfExtra.chromeFs = WebFS(entry);
 
                 safeApply($scope, function () {
-                  Ddf.reset();
+                  // Ddf.reset();
                   $scope.chromeFsRootPath = path;
                   $scope.loadMeasures();
                 });
@@ -206,7 +211,7 @@ module.exports = function (app) {
         };
 
         $scope.hasChromeFs = function () {
-          return !!Ddf.chromeFs;
+          return !!ddfExtra.chromeFs;
         };
 
         function areMeasuresBadForGo() {
@@ -246,7 +251,8 @@ module.exports = function (app) {
             return;
           }
 
-          var ddf = new Ddf($scope.ddf.url);
+          var ddf = new Ddf($scope.ddf.url,
+            ddfExtra.chromeFs ? new ChromeFileReader() : new FrontendFileReader());
 
           ddf.getIndex(function (err) {
             if (err) {
@@ -344,13 +350,18 @@ module.exports = function (app) {
 
             $scope.ddf.popup = false;
 
+
+            var ddfCsvReader = new DDFCSVReader('ddf1-csv-ext').getDDFCsvReaderObject(ddfExtra.chromeFs);
+            Vizabi.Reader.extend('ddf1-csv-ext', ddfCsvReader);
+
             if (config.isElectronApp) {
               Vizabi._globals.ext_resources.host = electronUrl;
               Vizabi._globals.ext_resources.preloadPath = '../../preview/data/';
             }
 
             Vizabi.Tool.define('preload', function (promise) {
-              Vizabi._globals.metadata = metadataContent;
+              Vizabi._globals.conceptprops = metadataContent;
+
               this.model.language.strings.set(this.model.language.id, translationsContent);
               promise.resolve();
             });
