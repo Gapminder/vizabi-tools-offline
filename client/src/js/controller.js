@@ -360,7 +360,8 @@ module.exports = function (app) {
             }
 
             Vizabi.Tool.define('preload', function (promise) {
-              Vizabi._globals.metadata = metadataContent;
+              Vizabi._globals.conceptprops = metadataContent;
+
               this.model.language.strings.set(this.model.language.id, translationsContent);
               promise.resolve();
             });

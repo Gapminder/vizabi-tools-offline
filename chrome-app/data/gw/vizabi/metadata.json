@@ -8673,6 +8673,13 @@
     1980,
     2008
    ]
+  },
+  "_default": {
+   "scales": [
+    "ordinal"
+   ],
+   "sourceLink": "",
+   "use": "constant"
   }
  },
  "indicatorsTree": {
