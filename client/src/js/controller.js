@@ -1,6 +1,6 @@
 var Vizabi = require('vizabi');
 var Ddf = require('vizabi-ddfcsv-reader').Ddf;
-var DDFCSVReader = require('vizabi-ddfcsv-reader').DDFCSVReader;
+var ddfCsvReader = require('vizabi-ddfcsv-reader');
 var ChromeFileReader = require('vizabi-ddfcsv-reader').ChromeFileReader;
 var FrontendFileReader = require('vizabi-ddfcsv-reader').FrontendFileReader;
 var async = require('async');
@@ -79,7 +79,6 @@ function chromeLoad(path, cb) {
 function prepareMetadataOnFly(ddfUrl) {
   return function (cb) {
     var metadataGenerator = new MetadataGenerator(ddfUrl.replace(/^file:/, ''));
-    console.log(ddfUrl.replace(/^file:/, ''));
 
     metadataGenerator.generate(function (err, metadataDescriptor) {
       cb(err, metadataDescriptor.metadata, metadataDescriptor.translations);
@@ -95,7 +94,7 @@ module.exports = function (app) {
         var electronUrl = '';
 
         if (config.isElectronApp) {
-          electronUrl = path.join('file://', config.electronPath, 'chrome-app/data/gw') + '/';
+          electronUrl = path.join('file://', config.electronPath, 'chrome-app/data/sg') + '/';
         }
 
         $scope.config = config;
@@ -155,9 +154,9 @@ module.exports = function (app) {
           }
 
           if (config.isChromeApp && $scope.ddf.chromeExternalDdfPath === 'false') {
-            $scope.ddf.url = '../data/gw/ddf';
-            $scope.ddf.metadataUrl = '../data/gw/vizabi/metadata.json';
-            $scope.ddf.translationsUrl = '../data/gw/vizabi/en.json';
+            $scope.ddf.url = '../data/sg/ddf';
+            $scope.ddf.metadataUrl = '../data/sg/vizabi/metadata.json';
+            $scope.ddf.translationsUrl = '../data/sg/vizabi/en.json';
           }
 
           if (config.isChromeApp && $scope.ddf.chromeExternalDdfPath === 'true') {
@@ -351,8 +350,8 @@ module.exports = function (app) {
             $scope.ddf.popup = false;
 
 
-            var ddfCsvReader = new DDFCSVReader('ddf1-csv-ext').getDDFCsvReaderObject(ddfExtra.chromeFs);
-            Vizabi.Reader.extend('ddf1-csv-ext', ddfCsvReader);
+            var readerObject = ddfCsvReader.getDDFCsvReaderObject(ddfExtra.chromeFs);
+            Vizabi.Reader.extend('ddf1-csv-ext', readerObject);
 
             if (config.isElectronApp) {
               Vizabi._globals.ext_resources.host = electronUrl;

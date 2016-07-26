@@ -11,6 +11,7 @@ lib-cov
 *.log
 *.csv
 !chrome-app/data/gw/ddf/*.csv
+!chrome-app/data/sg/ddf/*.csv
 *.dat
 *.out
 *.pid
