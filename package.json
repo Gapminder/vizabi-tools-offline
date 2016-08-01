@@ -65,7 +65,7 @@
     "node-bourbon": "4.2.8",
     "shelljs": "0.6.0",
     "vizabi": "0.13.12-2",
-    "vizabi-ddfcsv-reader": "0.3.3",
+    "vizabi-ddfcsv-reader": "0.3.5",
     "vizabi-metadata-generator": "0.0.7",
     "web-fs": "2.1.0"
   }
