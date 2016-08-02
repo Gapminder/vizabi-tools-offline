@@ -251,7 +251,7 @@ module.exports = function (app) {
           }
 
           var ddf = new Ddf($scope.ddf.url,
-            ddfExtra.chromeFs ? new ChromeFileReader() : new FrontendFileReader());
+            ddfExtra.chromeFs ? new ChromeFileReader(ddfExtra.chromeFs) : new FrontendFileReader());
 
           ddf.getIndex(function (err) {
             if (err) {
@@ -350,7 +350,8 @@ module.exports = function (app) {
             $scope.ddf.popup = false;
 
 
-            var readerObject = ddfCsvReader.getDDFCsvReaderObject(ddfExtra.chromeFs);
+            var readerObject = ddfCsvReader.getDDFCsvReaderObject(ddfExtra.chromeFs ?
+              new ChromeFileReader(ddfExtra.chromeFs) : new FrontendFileReader());
             Vizabi.Reader.extend('ddf1-csv-ext', readerObject);
 
             if (config.isElectronApp) {
