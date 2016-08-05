@@ -1,6 +1,6 @@
 {
   "name": "GapminderOffline",
-  "version": "0.13.12-2",
+  "version": "0.15.1-0",
   "description": "Gapminder Offline",
   "repository": {
     "type": "git",
@@ -12,9 +12,9 @@
     "build-chrome": "npm i && NODE_ENV=development webpack",
     "clean": "rm -rf ./dist",
     "build": "npm run clean && npm run build:linux && npm run build:osx && npm run build:win",
-    "build:osx": "scripts/build-macos.js \"Gapminder Offline\" \"Gapminder\" 0.13.12-2 2016",
-    "build:win": "scripts/build-win.js \"Gapminder Offline\" \"Gapminder\" 0.13.12-2 2016",
-    "build:linux": "scripts/build-linux.js \"Gapminder Offline\" \"Gapminder\" 0.13.12-2 2016"
+    "build:osx": "scripts/build-macos.js \"Gapminder Offline\" \"Gapminder\" 0.15.1-0 2016",
+    "build:win": "scripts/build-win.js \"Gapminder Offline\" \"Gapminder\" 0.15.1-0 2016",
+    "build:linux": "scripts/build-linux.js \"Gapminder Offline\" \"Gapminder\" 0.15.1-0 2016"
   },
   "files": [
     "bin"
@@ -64,7 +64,7 @@
     "lodash": "3.10.1",
     "node-bourbon": "4.2.8",
     "shelljs": "0.6.0",
-    "vizabi": "0.13.12-2",
+    "vizabi": "0.15.1-0",
     "vizabi-ddfcsv-reader": "0.3.6",
     "vizabi-metadata-generator": "0.0.7",
     "web-fs": "2.1.0"
